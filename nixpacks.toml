@@ -1,8 +1,5 @@
-[phases.setup]
-nixPkgs = ["jdk21_headless", "maven"]
-
 [phases.build]
-cmds = ["java -version", "mvn -version", "cd backend && mvn clean package -DskipTests -B"]
+cmds = ["cd backend && mvn clean package -DskipTests -B"]
 
 [start]
 cmd = "java -jar backend/target/*.jar"

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { NotificationService } from '../services/notification.service';
 import { AuthService } from '../services/auth.service';
 
@@ -10,10 +11,12 @@ import { AuthService } from '../services/auth.service';
   imports: [CommonModule],
   templateUrl: './notifications.component.html'
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: any[] = [];
   loading = true;
   currentUser: any;
+
+  private incomingSub?: Subscription;
 
   constructor(
     private notifService: NotificationService,
@@ -23,18 +26,37 @@ export class NotificationsComponent implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
-    if (this.currentUser) {
-      this.notifService.getNotifications(this.currentUser.id).subscribe(data => {
-        this.notifications = data;
-        this.loading = false;
-      });
-    }
+    if (!this.currentUser) return;
+
+    this.notifService.getNotifications(this.currentUser.id).subscribe(data => {
+      this.notifications = data;
+      this.loading = false;
+    });
+
+    this.incomingSub = this.notifService.incoming$.subscribe((event: any) => {
+      if (event.type === 'MESSAGE') return;
+      const notif = {
+        id: event.id,
+        type: event.type,
+        title: event.title,
+        body: event.body,
+        relatedId: event.relatedId,
+        read: false,
+        createdAt: new Date().toISOString()
+      };
+      this.notifications = [notif, ...this.notifications];
+    });
+  }
+
+  ngOnDestroy() {
+    this.incomingSub?.unsubscribe();
   }
 
   markAllRead() {
     if (!this.currentUser) return;
     this.notifService.markAllAsRead(this.currentUser.id).subscribe(() => {
       this.notifications.forEach(n => n.read = true);
+      this.notifService.unreadNotif$.next(0);
     });
   }
 
@@ -42,9 +64,14 @@ export class NotificationsComponent implements OnInit {
     if (!n.read) {
       this.notifService.markAsRead(n.id).subscribe();
       n.read = true;
+      const current = this.notifService.unreadNotif$.getValue();
+      this.notifService.unreadNotif$.next(Math.max(0, current - 1));
     }
-    if (n.relatedType === 'proposal') this.router.navigate(['/propostas']);
-    else if (n.relatedType === 'user') this.router.navigate(['/mensagens']);
+    if (n.type === 'FOLLOW') this.router.navigate(['/user', n.relatedId]);
+    else if (n.type === 'MESSAGE') this.router.navigate(['/mensagens'], { queryParams: { partnerId: n.relatedId } });
+    else if (n.type === 'PROPOSAL') this.router.navigate(['/propostas']);
+    else if (n.type === 'COMMENT' || n.type === 'LIKE') this.router.navigate(['/']);
+    else if (n.type === 'INVITE') this.router.navigate(['/startup']);
   }
 
   typeIcon(type: string): string {

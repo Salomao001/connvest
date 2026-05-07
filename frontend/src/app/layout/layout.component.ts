@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
+import { ChatService } from '../services/chat.service';
 
 @Component({
   selector: 'app-layout',
@@ -12,24 +14,49 @@ import { NotificationService } from '../services/notification.service';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
-export class LayoutComponent implements OnInit {
+export class LayoutComponent implements OnInit, OnDestroy {
   searchQuery = '';
   unreadNotifications = 0;
+  unreadMessages = 0;
   showMoreMenu = false;
+
+  private streamSub?: Subscription;
+  private notifSub?: Subscription;
+  private msgSub?: Subscription;
 
   constructor(
     private router: Router,
     public authService: AuthService,
-    private notifService: NotificationService
+    public notifService: NotificationService,
+    private chatService: ChatService
   ) {}
 
   ngOnInit() {
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.notifService.getUnreadCount(user.id).subscribe(data => {
-        this.unreadNotifications = data.count;
+      this.chatService.connect(user.id);
+      this.notifService.getGeneralUnreadCount(user.id).subscribe(d => this.notifService.unreadNotif$.next(d.count));
+      this.notifService.getMessageUnreadCount(user.id).subscribe(d => this.notifService.unreadMsg$.next(d.count));
+      this.notifSub = this.notifService.unreadNotif$.subscribe(n => this.unreadNotifications = n);
+      this.msgSub   = this.notifService.unreadMsg$.subscribe(n => this.unreadMessages = n);
+      this.streamSub = this.notifService.streamNotifications(user.id).subscribe(event => {
+        if (!event) return;
+        this.notifService.incoming$.next(event);
+        if (event.type === 'MESSAGE') {
+          if (this.chatService.activePartnerId !== event.relatedId) {
+            this.notifService.unreadMsg$.next(this.notifService.unreadMsg$.getValue() + 1);
+          }
+        } else {
+          this.notifService.unreadNotif$.next(this.notifService.unreadNotif$.getValue() + 1);
+        }
       });
     }
+  }
+
+  ngOnDestroy() {
+    this.streamSub?.unsubscribe();
+    this.notifSub?.unsubscribe();
+    this.msgSub?.unsubscribe();
   }
 
   onSearch() {

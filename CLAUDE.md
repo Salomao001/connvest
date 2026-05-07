@@ -2,6 +2,8 @@
 
 Keep the design and interface as it currently is and don't change the standard.
 
+Always generate a summary of what you did after you finish processing.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview

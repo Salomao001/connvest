@@ -22,20 +22,23 @@
           Nenhuma conversa ainda.
         </div>
 
-        <button *ngFor="let conv of conversations"
+        <div *ngFor="let conv of conversations"
           (click)="openConversation(conv)"
-          class="flex w-full items-center gap-3 border-b border-slate-100 p-4 text-left transition-colors"
+          class="flex w-full cursor-pointer items-center gap-3 border-b border-slate-100 p-4 text-left transition-colors"
           [ngClass]="activeConversation?.partnerId === conv.partnerId ? 'bg-blue-50' : 'bg-white hover:bg-slate-50'">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-300 text-sm font-bold text-slate-700">
-            <ng-container *ngIf="conv.partnerPhoto && conv.partnerPhoto.startsWith('http'); else initials">
-              <img [src]="conv.partnerPhoto" class="h-full w-full rounded-full object-cover" alt="">
-            </ng-container>
-            <ng-template #initials>{{ getInitial(conv.partnerName) }}</ng-template>
-          </div>
-          <div class="min-w-0 flex-1">
-            <p class="truncate text-sm font-semibold text-slate-900">{{ conv.partnerName }}</p>
-            <p class="truncate text-xs text-slate-500">{{ conv.lastMessage }}</p>
-          </div>
+          <a [routerLink]="['/user', conv.partnerId]" (click)="$event.stopPropagation()"
+             class="flex min-w-0 flex-1 items-center gap-3 hover:opacity-80">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-300 text-sm font-bold text-slate-700">
+              <ng-container *ngIf="conv.partnerPhoto && conv.partnerPhoto.startsWith('http'); else initials">
+                <img [src]="conv.partnerPhoto" class="h-full w-full rounded-full object-cover" alt="">
+              </ng-container>
+              <ng-template #initials>{{ getInitial(conv.partnerName) }}</ng-template>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-semibold text-slate-900">{{ conv.partnerName }}</p>
+              <p class="truncate text-xs text-slate-500">{{ conv.lastMessage }}</p>
+            </div>
+          </a>
           <div class="flex shrink-0 flex-col items-end gap-1">
             <span class="text-xs text-slate-400">{{ timeAgo(conv.lastMessageAt) }}</span>
             <span *ngIf="conv.unreadCount > 0"
@@ -43,7 +46,7 @@
               {{ conv.unreadCount }}
             </span>
           </div>
-        </button>
+        </div>
       </aside>
 
       <!-- Chat area -->
@@ -57,18 +60,22 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
               </svg>
             </button>
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-300 text-sm font-bold text-slate-700">
-              <ng-container *ngIf="activeConversation.partnerPhoto && activeConversation.partnerPhoto.startsWith('http'); else hi">
-                <img [src]="activeConversation.partnerPhoto" class="h-full w-full rounded-full object-cover" alt="">
-              </ng-container>
-              <ng-template #hi>{{ getInitial(activeConversation.partnerName) }}</ng-template>
-            </div>
-            <div>
-              <h2 class="font-semibold text-slate-900">{{ activeConversation.partnerName }}</h2>
-            </div>
+            <a [routerLink]="['/user', activeConversation.partnerId]"
+               class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-300 text-sm font-bold text-slate-700">
+                <ng-container *ngIf="activeConversation.partnerPhoto && activeConversation.partnerPhoto.startsWith('http'); else hi">
+                  <img [src]="activeConversation.partnerPhoto" class="h-full w-full rounded-full object-cover" alt="">
+                </ng-container>
+                <ng-template #hi>{{ getInitial(activeConversation.partnerName) }}</ng-template>
+              </div>
+              <div>
+                <h2 class="font-semibold text-slate-900">{{ activeConversation.partnerName }}</h2>
+                <p class="text-xs text-slate-400">Ver perfil</p>
+              </div>
+            </a>
           </div>
 
-          <div class="flex-1 space-y-3 overflow-y-auto p-4">
+          <div #messagesContainer class="flex-1 space-y-3 overflow-y-auto p-4">
             <div *ngFor="let msg of messages"
               class="flex"
               [ngClass]="isMine(msg) ? 'justify-end' : 'justify-start'">

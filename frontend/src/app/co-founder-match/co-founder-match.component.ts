@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { SearchService } from '../services/search.service';
 import { StartupService } from '../services/startup.service';
 import { AuthService } from '../services/auth.service';
@@ -10,7 +11,7 @@ import { UserService } from '../services/user.service';
 @Component({
   selector: 'app-co-founder-match',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './co-founder-match.component.html'
 })
 export class CoFounderMatchComponent implements OnInit {

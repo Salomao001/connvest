@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
@@ -26,34 +26,67 @@ export class ProfileUser implements OnInit {
   followCount = 0;
   sentProposals: any[] = [];
   savedStartups: any[] = [];
+  isOwnProfile = true;
+  following = false;
 
   constructor(
     private userService: UserService,
     private authService: AuthService,
     private followService: FollowService,
     private proposalService: ProposalService,
-    private savedService: SavedStartupService
+    private savedService: SavedStartupService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    const currentUser = this.authService.getCurrentUser();
-    const userId = currentUser?.id ?? 1;
+    this.route.paramMap.subscribe(params => {
+      const paramId = params.get('id');
+      const currentUser = this.authService.getCurrentUser();
 
+      if (paramId && Number(paramId) !== currentUser?.id) {
+        this.isOwnProfile = false;
+        const userId = Number(paramId);
+        this.loadPublicProfile(userId, currentUser?.id ?? 0);
+      } else {
+        this.isOwnProfile = true;
+        const userId = currentUser?.id ?? 1;
+        this.loadOwnProfile(userId);
+      }
+    });
+  }
+
+  private loadOwnProfile(userId: number) {
     this.userService.getUser(userId).subscribe(data => {
       this.user = data;
       this.profileForm = this.createFormFromUser(data);
     });
-
-    this.userService.getUserStartups(userId).subscribe(startups => {
-      this.userStartups = startups;
-    });
-
-    this.followService.getStatus(0, 'USER', userId).subscribe(data => {
-      this.followCount = data.count;
-    });
-
+    this.userService.getUserStartups(userId).subscribe(s => { this.userStartups = s; });
+    this.followService.getStatus(0, 'USER', userId).subscribe(data => { this.followCount = data.count; });
     this.proposalService.getSent(userId).subscribe(data => { this.sentProposals = data; });
     this.savedService.getSaved(userId).subscribe(data => { this.savedStartups = data; });
+  }
+
+  private loadPublicProfile(userId: number, currentUserId: number) {
+    this.userService.getUser(userId).subscribe(data => { this.user = data; });
+    this.userService.getUserStartups(userId).subscribe(s => { this.userStartups = s; });
+    this.followService.getStatus(currentUserId, 'USER', userId).subscribe(data => {
+      this.followCount = data.count;
+      this.following = data.following;
+    });
+  }
+
+  toggleFollow() {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser || !this.user) return;
+    this.followService.toggleFollow(currentUser.id, 'USER', this.user.id).subscribe(() => {
+      this.following = !this.following;
+      this.followCount += this.following ? 1 : -1;
+    });
+  }
+
+  goToMessages() {
+    this.router.navigate(['/mensagens'], { queryParams: { partnerId: this.user.id } });
   }
 
   startEditing() {

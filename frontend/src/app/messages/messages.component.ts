@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from '../services/message.service';
 import { AuthService } from '../services/auth.service';
+import { ActivatedRoute } from '@angular/router';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-messages',
@@ -21,21 +23,45 @@ export class MessagesComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
-    if (this.currentUser) {
+    if (!this.currentUser) return;
+
+    const partnerId = this.route.snapshot.queryParamMap.get('partnerId');
+    if (partnerId) {
+      this.openOrCreateConversation(Number(partnerId));
+    } else {
       this.loadConversations();
     }
   }
 
-  loadConversations() {
+  private openOrCreateConversation(partnerId: number) {
+    this.userService.getUser(partnerId).subscribe(partner => {
+      this.loadConversations(() => {
+        const existing = this.conversations.find(c => c.partnerId === partnerId);
+        if (existing) {
+          this.openConversation(existing);
+        } else {
+          const newConv = { partnerId: partner.id, partnerName: partner.name, partnerPhoto: partner.photo, lastMessage: '' };
+          this.conversations.unshift(newConv);
+          this.openConversation(newConv);
+        }
+      });
+    });
+  }
+
+  loadConversations(callback?: () => void) {
     this.messageService.getConversations(this.currentUser.id).subscribe(convs => {
       this.conversations = convs;
       this.loading = false;
-      if (convs.length > 0 && !this.activeConversation) {
+      if (callback) {
+        callback();
+      } else if (convs.length > 0 && !this.activeConversation) {
         this.openConversation(convs[0]);
       }
       this.cdr.detectChanges();

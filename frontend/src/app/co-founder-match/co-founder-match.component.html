@@ -40,7 +40,7 @@
       <p class="text-sm mt-1">Tente outro filtro de área.</p>
     </div>
 
-    <article *ngFor="let founder of founders" class="app-card flex flex-col gap-4 p-5">
+    <article *ngFor="let founder of founders" class="app-card flex flex-col gap-4 p-5 hover:border-blue-200 transition-colors">
       <div class="flex items-start gap-3">
         <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-base font-bold text-slate-700">
           <ng-container *ngIf="founder.photo && founder.photo.startsWith('http'); else f_init">
@@ -49,7 +49,7 @@
           <ng-template #f_init>{{ getInitial(founder.name) }}</ng-template>
         </div>
         <div class="flex-1 min-w-0">
-          <h2 class="font-bold text-slate-900">{{ founder.name }}</h2>
+          <a [routerLink]="['/user', founder.id]" class="font-bold text-slate-900 hover:text-blue-700">{{ founder.name }}</a>
           <p class="text-xs text-slate-500">
             <span class="app-chip py-0.5">{{ (founder.profileTypes || ['Founder'])[0] }}</span>
             <span *ngIf="founder.location"> · {{ founder.location }}</span>

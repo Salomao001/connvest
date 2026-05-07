@@ -30,6 +30,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: FeedComponent },
       { path: 'profile', component: ProfileUser },
+      { path: 'user/:id', component: ProfileUser },
       { path: 'startup/new', component: CreateStartupComponent },
       { path: 'startup', component: MyStartupsComponent },
       { path: 'startup/:id', component: ProfileStartup },

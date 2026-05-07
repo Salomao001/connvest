@@ -15,6 +15,7 @@ import { NotificationService } from '../services/notification.service';
 export class LayoutComponent implements OnInit {
   searchQuery = '';
   unreadNotifications = 0;
+  showMoreMenu = false;
 
   constructor(
     private router: Router,

@@ -1,54 +1,104 @@
 <div class="app-page">
-  <header class="mb-7">
+  <header class="mb-6">
     <h1 class="app-title">Descobrir</h1>
-    <p class="app-subtitle">Encontre startups, founders e investidores</p>
+    <p class="app-subtitle">Startups, founders, investidores e co-founders em um só lugar</p>
   </header>
+
+  <!-- Tabs -->
+  <div class="mb-5 -mx-4 sm:mx-0">
+    <div class="flex overflow-x-auto scrollbar-none px-4 sm:px-0 pb-1">
+      <div class="inline-flex shrink-0 gap-1 rounded-xl bg-slate-100 p-1">
+        <button (click)="setTab('startups')" class="app-tab whitespace-nowrap" [ngClass]="activeTab === 'startups' ? 'app-tab-active' : ''">
+          Startups ({{ startups.length }})
+        </button>
+        <button (click)="setTab('pessoas')" class="app-tab whitespace-nowrap" [ngClass]="activeTab === 'pessoas' ? 'app-tab-active' : ''">
+          Pessoas ({{ users.length }})
+        </button>
+        <button (click)="setTab('investidores')" class="app-tab whitespace-nowrap" [ngClass]="activeTab === 'investidores' ? 'app-tab-active' : ''">
+          Investidores ({{ investors.length }})
+        </button>
+        <button (click)="setTab('cofounders')" class="app-tab whitespace-nowrap" [ngClass]="activeTab === 'cofounders' ? 'app-tab-active' : ''">
+          Co-founders ({{ coFounderUsers.length }})
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Filters -->
   <section class="app-card mb-5 p-4">
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_180px_180px]">
-      <div class="relative">
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Search (always visible) -->
+      <div class="relative min-w-[200px] flex-[2]">
         <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
         </svg>
-        <input [(ngModel)]="searchQuery" (keyup.enter)="performSearch()" class="app-input h-10 w-full pl-9 bg-white" placeholder="Buscar startup, founder...">
+        <input [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" class="app-input h-10 w-full pl-9 bg-white" placeholder="Buscar...">
       </div>
-      <select [(ngModel)]="stageFilter" (change)="onStageChange()" class="app-input h-10 bg-white">
-        <option *ngFor="let stage of startupStages" [value]="stage.value">{{ stage.label }}</option>
-      </select>
-      <select [(ngModel)]="coFounderArea" (change)="onCoFounderAreaChange()" class="app-input h-10 bg-white">
-        <option *ngFor="let area of coFounderAreas" [value]="area.value">{{ area.label }}</option>
-      </select>
+
+      <!-- Startups filters -->
+      <ng-container *ngIf="activeTab === 'startups'">
+        <select [(ngModel)]="stageFilter" (ngModelChange)="loadStartups()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
+          <option *ngFor="let s of startupStages" [value]="s.value">{{ s.label }}</option>
+        </select>
+        <select [(ngModel)]="sectorFilter" (ngModelChange)="loadStartups()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
+          <option value="">Todos os setores</option>
+          <option *ngFor="let s of startupSectors.slice(1)" [value]="s">{{ s }}</option>
+        </select>
+      </ng-container>
+
+      <!-- Pessoas filters -->
+      <ng-container *ngIf="activeTab === 'pessoas'">
+        <select [(ngModel)]="profileTypeFilter" (ngModelChange)="loadPeople()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
+          <option *ngFor="let p of profileTypes" [value]="p.value">{{ p.label }}</option>
+        </select>
+      </ng-container>
+
+      <!-- Investidores filters -->
+      <ng-container *ngIf="activeTab === 'investidores'">
+        <select [(ngModel)]="investorTypeFilter" (ngModelChange)="loadInvestors()" class="app-input h-10 flex-1 min-w-[140px] bg-white">
+          <option *ngFor="let t of investorTypes" [value]="t.value">{{ t.label }}</option>
+        </select>
+        <select [(ngModel)]="investorSectorFilter" (ngModelChange)="loadInvestors()" class="app-input h-10 flex-1 min-w-[140px] bg-white">
+          <option value="">Todos os setores</option>
+          <option *ngFor="let s of investorSectors.slice(1)" [value]="s">{{ s }}</option>
+        </select>
+        <select [(ngModel)]="investorStageFilter" (ngModelChange)="loadInvestors()" class="app-input h-10 flex-1 min-w-[140px] bg-white">
+          <option value="">Todos os estágios</option>
+          <option *ngFor="let s of investorStages.slice(1)" [value]="s">{{ s }}</option>
+        </select>
+      </ng-container>
+
+      <!-- Co-founders filters -->
+      <ng-container *ngIf="activeTab === 'cofounders'">
+        <select [(ngModel)]="coFounderArea" (ngModelChange)="loadCoFounders()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
+          <option *ngFor="let a of coFounderAreas" [value]="a.value">{{ a.label }}</option>
+        </select>
+        <select [(ngModel)]="coFounderDedication" (ngModelChange)="loadCoFounders()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
+          <option *ngFor="let d of coFounderDedications" [value]="d.value">{{ d.label }}</option>
+        </select>
+      </ng-container>
     </div>
   </section>
 
-  <!-- Tabs -->
-  <div class="app-tabbar mb-5">
-    <button (click)="activeTab = 'startups'" class="app-tab" [ngClass]="activeTab === 'startups' ? 'app-tab-active' : ''">
-      Startups ({{ startups.length }})
-    </button>
-    <button (click)="activeTab = 'people'" class="app-tab" [ngClass]="activeTab === 'people' ? 'app-tab-active' : ''">
-      Pessoas ({{ (users.length || coFounderUsers.length) }})
-    </button>
+  <!-- Loading -->
+  <div *ngIf="loading || loadingStartups || loadingInvestors || loadingCoFounders" class="app-card p-8 text-center text-sm text-slate-500">
+    Carregando...
   </div>
 
-  <div *ngIf="loading || loadingStartups" class="app-card p-8 text-center text-sm text-slate-500">Carregando resultados...</div>
-
-  <!-- Startups tab US-021 -->
+  <!-- ── STARTUPS ── -->
   <section *ngIf="activeTab === 'startups' && !loading && !loadingStartups">
     <div *ngIf="startups.length === 0" class="app-card p-10 text-center">
       <p class="font-semibold text-slate-900">Nenhuma startup encontrada</p>
       <p class="mt-1 text-sm text-slate-500">Ajuste os filtros ou busque por nome.</p>
     </div>
-
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-      <div *ngFor="let s of startups; let i = index" class="relative">
+      <div *ngFor="let s of startups" class="relative">
         <a [routerLink]="['/startup', s.id]" class="app-card block p-5 hover:border-blue-200 transition-colors">
           <div class="mb-3 flex items-start gap-3">
             <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg font-bold text-white" [ngClass]="logoColor(s.name)">
               {{ s.name.charAt(0) }}
             </div>
-            <div class="flex-1 min-w-0">
+            <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
                 <h3 class="font-bold text-slate-900">{{ s.name }}</h3>
                 <span *ngIf="s.badges" class="app-chip text-xs">{{ s.badges }}</span>
@@ -62,7 +112,6 @@
             <span *ngIf="s.usersCount">♙ {{ s.usersCount }} usuários</span>
           </div>
         </a>
-        <!-- Save button US-044 -->
         <button (click)="toggleSave(s, $event)"
           class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
           [ngClass]="isSaved(s.id) ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-500 hover:bg-blue-50 hover:text-blue-700'"
@@ -75,71 +124,264 @@
     </div>
   </section>
 
-  <!-- People tab US-022 -->
-  <section *ngIf="activeTab === 'people' && !loading">
-    <!-- Search results users -->
-    <div *ngIf="users.length > 0" class="mb-6">
-      <h2 class="mb-3 font-semibold text-slate-800">Resultados da busca</h2>
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <div *ngFor="let u of users" class="app-card p-4">
-          <div class="flex items-center gap-3">
-            <a [routerLink]="['/user', u.id]" class="flex flex-1 min-w-0 items-center gap-3 hover:opacity-80">
-              <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-sm font-bold text-slate-700">
-                <img *ngIf="u.photo && u.photo.startsWith('http')" [src]="u.photo" class="h-full w-full object-cover" alt="">
-                <span *ngIf="!u.photo || !u.photo.startsWith('http')">{{ u.name.charAt(0) }}</span>
-              </div>
-              <div class="min-w-0">
-                <h3 class="font-bold text-slate-900">{{ u.name }}</h3>
-                <div class="flex flex-wrap gap-1 mt-0.5">
-                  <span *ngFor="let t of u.profileTypes" class="app-chip text-xs py-0">{{ t }}</span>
-                </div>
-              </div>
-            </a>
-            <button (click)="followUser(u.id, $event)"
-              class="shrink-0 app-button-secondary h-8 px-3 text-xs"
-              [ngClass]="isFollowing('USER', u.id) ? 'bg-blue-700 text-white' : ''">
-              {{ isFollowing('USER', u.id) ? 'Seguindo' : 'Seguir' }}
-            </button>
-          </div>
-          <p *ngIf="u.bio" class="mt-3 text-sm text-slate-700 line-clamp-2">{{ u.bio }}</p>
-          <div *ngIf="u.mainSkills" class="mt-2 flex flex-wrap gap-1">
-            <span *ngFor="let skill of u.mainSkills?.split(',').slice(0,3)" class="app-chip text-xs">{{ skill.trim() }}</span>
-          </div>
-        </div>
-      </div>
+  <!-- ── PESSOAS ── -->
+  <section *ngIf="activeTab === 'pessoas' && !loading">
+    <div *ngIf="users.length === 0" class="app-card p-10 text-center">
+      <p class="font-semibold text-slate-900">Nenhuma pessoa encontrada</p>
+      <p class="mt-1 text-sm text-slate-500">Tente buscar por nome ou filtrar por tipo.</p>
     </div>
-
-    <!-- Co-founder seeking section -->
-    <div *ngIf="!loadingCoFounders && coFounderUsers.length > 0">
-      <h2 class="mb-3 flex items-center gap-1.5 font-semibold text-slate-800">
-        <svg class="h-4 w-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
-        Buscando co-founder
-      </h2>
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <a [routerLink]="['/user', u.id]" *ngFor="let u of coFounderUsers" class="app-card block p-4 hover:border-blue-200 transition-colors">
-          <div class="flex items-center gap-3 mb-3">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div *ngFor="let u of users" class="app-card p-4">
+        <div class="flex items-center gap-3">
+          <a [routerLink]="['/user', u.id]" class="flex flex-1 min-w-0 items-center gap-3 hover:opacity-80">
             <div class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-sm font-bold text-slate-700">
               <img *ngIf="u.photo && u.photo.startsWith('http')" [src]="u.photo" class="h-full w-full object-cover" alt="">
               <span *ngIf="!u.photo || !u.photo.startsWith('http')">{{ u.name.charAt(0) }}</span>
             </div>
-            <div>
+            <div class="min-w-0">
               <h3 class="font-bold text-slate-900">{{ u.name }}</h3>
-              <span *ngIf="u.location" class="text-xs text-slate-500">{{ u.location }}</span>
+              <div class="flex flex-wrap gap-1 mt-0.5">
+                <span *ngFor="let t of u.profileTypes" class="app-chip text-xs py-0">{{ t }}</span>
+              </div>
+            </div>
+          </a>
+          <button (click)="followUser(u.id, $event)" class="shrink-0 app-button-secondary h-8 px-3 text-xs"
+            [ngClass]="isFollowing('USER', u.id) ? 'bg-blue-700 text-white border-blue-700' : ''">
+            {{ isFollowing('USER', u.id) ? 'Seguindo' : 'Seguir' }}
+          </button>
+        </div>
+        <p *ngIf="u.bio" class="mt-3 text-sm text-slate-700 line-clamp-2">{{ u.bio }}</p>
+        <div *ngIf="u.mainSkills" class="mt-2 flex flex-wrap gap-1">
+          <span *ngFor="let skill of splitTags(u.mainSkills).slice(0,3)" class="app-chip text-xs">{{ skill }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── INVESTIDORES ── -->
+  <section *ngIf="activeTab === 'investidores' && !loadingInvestors">
+    <div *ngIf="investors.length === 0" class="app-card p-10 text-center">
+      <p class="font-semibold text-slate-900">Nenhum investidor encontrado</p>
+      <p class="mt-1 text-sm text-slate-500">Tente ajustar os filtros de busca.</p>
+    </div>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <article *ngFor="let investor of investors" class="app-card flex flex-col gap-4 p-5">
+        <div class="flex items-start gap-3">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-base font-bold text-slate-700">
+            <ng-container *ngIf="investor.photo && investor.photo.startsWith('http'); else inv_init">
+              <img [src]="investor.photo" class="h-full w-full object-cover" alt="">
+            </ng-container>
+            <ng-template #inv_init>{{ getInitial(investor.name) }}</ng-template>
+          </div>
+          <div class="min-w-0 flex-1">
+            <h2 class="font-bold text-slate-900">{{ investor.name }}</h2>
+            <div class="mt-1 flex flex-wrap items-center gap-1.5">
+              <span *ngIf="investor.investorType" class="app-chip py-0.5 capitalize">{{ investor.investorType }}</span>
+              <span *ngIf="investor.location" class="text-xs text-slate-500">· {{ investor.location }}</span>
             </div>
           </div>
-          <p *ngIf="u.bio" class="text-sm text-slate-700 line-clamp-2">{{ u.bio }}</p>
-          <div class="mt-3 flex flex-wrap gap-1.5">
-            <span *ngIf="u.coFounderArea" class="app-chip text-xs">{{ u.coFounderArea }}</span>
-            <span *ngIf="u.coFounderDedication" class="app-chip text-xs">{{ u.coFounderDedication }}</span>
+          <div class="shrink-0 text-right">
+            <div class="text-lg font-bold text-blue-700">{{ investorScore(investor) }}</div>
+            <div class="text-xs text-slate-400">Score</div>
           </div>
-          <p *ngIf="u.coFounderDescription" class="mt-2 text-xs text-slate-500 italic">{{ u.coFounderDescription }}</p>
-        </a>
+        </div>
+        <p *ngIf="investor.bio" class="text-sm leading-relaxed text-slate-700 line-clamp-2">{{ investor.bio }}</p>
+        <div *ngIf="investor.sectorsOfInterest || investor.stagesOfInterest || investor.averageTicket" class="space-y-1.5 rounded-lg bg-slate-50 p-3 text-xs">
+          <div *ngIf="investor.sectorsOfInterest" class="flex gap-2">
+            <span class="w-16 shrink-0 font-semibold text-slate-500">Setores</span>
+            <span class="text-slate-700">{{ investor.sectorsOfInterest }}</span>
+          </div>
+          <div *ngIf="investor.stagesOfInterest" class="flex gap-2">
+            <span class="w-16 shrink-0 font-semibold text-slate-500">Estágios</span>
+            <span class="text-slate-700">{{ investor.stagesOfInterest }}</span>
+          </div>
+          <div *ngIf="investor.averageTicket" class="flex gap-2">
+            <span class="w-16 shrink-0 font-semibold text-slate-500">Ticket</span>
+            <span class="font-semibold text-slate-700">{{ investor.averageTicket }}</span>
+          </div>
+        </div>
+        <div *ngIf="investor.valueAdd" class="flex flex-wrap gap-1.5">
+          <span *ngFor="let tag of splitTags(investor.valueAdd)" class="app-chip text-xs">{{ tag }}</span>
+        </div>
+        <div class="mt-auto flex gap-2 pt-2">
+          <button (click)="openInvestorProposal(investor)" class="app-button-primary flex-1 text-sm">Enviar proposta</button>
+          <a [routerLink]="['/user', investor.id]" class="app-button-secondary flex items-center px-4 text-sm">Ver perfil</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── CO-FOUNDERS ── -->
+  <section *ngIf="activeTab === 'cofounders' && !loadingCoFounders">
+    <div class="mb-4 rounded-xl border border-sky-200 bg-sky-50 p-4">
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-600 text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="font-semibold text-slate-900">Score de compatibilidade</h2>
+          <p class="text-sm text-slate-500">Baseado em skills, área e localização.</p>
+        </div>
       </div>
     </div>
 
-    <div *ngIf="!loading && !loadingCoFounders && users.length === 0 && coFounderUsers.length === 0" class="app-card p-10 text-center">
-      <p class="font-semibold text-slate-900">Nenhuma pessoa encontrada</p>
-      <p class="mt-1 text-sm text-slate-500">Tente buscar por nome ou área.</p>
+    <div *ngIf="coFounderUsers.length === 0" class="app-card p-10 text-center">
+      <p class="font-semibold text-slate-900">Nenhum co-founder encontrado</p>
+      <p class="mt-1 text-sm text-slate-500">Tente outro filtro de área ou dedicação.</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <article *ngFor="let founder of coFounderUsers" class="app-card flex flex-col gap-3 p-5 hover:border-blue-200 transition-colors">
+        <div class="flex items-start gap-3">
+          <a [routerLink]="['/user', founder.id]" class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-base font-bold text-slate-700 hover:ring-2 hover:ring-blue-400">
+            <img *ngIf="founder.photo && founder.photo.startsWith('http')" [src]="founder.photo" class="h-full w-full object-cover" alt="">
+            <span *ngIf="!founder.photo || !founder.photo.startsWith('http')">{{ getInitial(founder.name) }}</span>
+          </a>
+          <div class="min-w-0 flex-1">
+            <a [routerLink]="['/user', founder.id]" class="font-bold text-slate-900 hover:text-blue-700">{{ founder.name }}</a>
+            <p *ngIf="founder.location" class="text-xs text-slate-500">{{ founder.location }}</p>
+          </div>
+          <div class="shrink-0 text-right">
+            <div class="text-lg font-bold" [ngClass]="scoreColor(compatibilityScore(founder))">{{ compatibilityScore(founder) }}%</div>
+            <div class="text-xs text-slate-400">Match</div>
+          </div>
+        </div>
+
+        <p *ngIf="founder.bio" class="text-sm text-slate-700 line-clamp-2">{{ founder.bio }}</p>
+
+        <div class="flex flex-wrap gap-1.5">
+          <span *ngFor="let skill of splitTags(founder.mainSkills).slice(0,3)" class="app-chip text-xs">{{ skill }}</span>
+          <span *ngIf="founder.coFounderArea" class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">{{ founder.coFounderArea }}</span>
+          <span *ngIf="founder.coFounderDedication" class="app-chip text-xs">{{ founder.coFounderDedication }}</span>
+        </div>
+
+        <p *ngIf="founder.coFounderDescription" class="text-xs text-slate-500 italic line-clamp-2">{{ founder.coFounderDescription }}</p>
+
+        <button (click)="openCoFounderProposal(founder)" class="app-button-primary w-full text-sm">
+          Enviar proposta de co-founder
+        </button>
+      </article>
     </div>
   </section>
+</div>
+
+<!-- ── INVESTOR PROPOSAL MODAL ── -->
+<div *ngIf="showInvestorModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4" (click)="closeInvestorModal()">
+  <div class="w-full max-w-lg rounded-t-2xl sm:rounded-2xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+    <div *ngIf="!investorProposalSent">
+      <h2 class="mb-1 text-lg font-bold text-slate-900">{{ isAdvisor(selectedInvestor) ? 'Proposta de advisorship' : 'Proposta de investimento' }}</h2>
+      <p class="mb-5 text-sm text-slate-500">Para {{ selectedInvestor?.name }}</p>
+
+      <div *ngIf="profileCompleteness < 75" class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+        ⚠️ Perfil {{ profileCompleteness }}% completo. Propostas com perfis completos têm mais chances.
+        <a routerLink="/profile" class="ml-1 font-semibold text-blue-700 underline">Completar</a>
+      </div>
+      <div class="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+        ⚠️ Esta plataforma não intermedia investimentos. Conexões são informais — negociações formais acontecem fora da plataforma.
+      </div>
+
+      <div class="space-y-3">
+        <div *ngIf="userStartups.length > 0">
+          <label class="mb-1 block text-xs font-semibold text-slate-700">Startup relacionada</label>
+          <select [(ngModel)]="investorProposal.startupId" class="app-input w-full">
+            <option value="">Selecionar startup</option>
+            <option *ngFor="let s of userStartups" [value]="s.startupId">{{ s.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-semibold text-slate-700">Pitch <span class="text-red-500">*</span></label>
+          <textarea [(ngModel)]="investorProposal.pitch" rows="3" class="app-input w-full" placeholder="Descreva sua startup, tração e proposta..."></textarea>
+        </div>
+        <div *ngIf="!isAdvisor(selectedInvestor)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-700">Valor buscado (opcional)</label>
+            <input [(ngModel)]="investorProposal.seekedValue" class="app-input w-full" placeholder="Ex: R$ 500k">
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-700">Uso do capital (opcional)</label>
+            <input [(ngModel)]="investorProposal.capitalUse" class="app-input w-full" placeholder="Ex: Marketing, time...">
+          </div>
+        </div>
+        <div *ngIf="!isAdvisor(selectedInvestor)">
+          <label class="mb-1 block text-xs font-semibold text-slate-700">Por que este investidor?</label>
+          <input [(ngModel)]="investorProposal.whyThisInvestor" class="app-input w-full" placeholder="O que vocês têm em comum?">
+        </div>
+        <div *ngIf="isAdvisor(selectedInvestor)">
+          <label class="mb-1 block text-xs font-semibold text-slate-700">Área de suporte desejada</label>
+          <input [(ngModel)]="investorProposal.supportArea" class="app-input w-full" placeholder="Ex: GTM, Vendas B2B...">
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-3">
+        <button (click)="sendInvestorProposal()" class="app-button-primary flex-1" [disabled]="sendingInvestorProposal || !investorProposal.pitch?.trim()">
+          {{ sendingInvestorProposal ? 'Enviando...' : 'Enviar proposta' }}
+        </button>
+        <button (click)="closeInvestorModal()" class="app-button-secondary">Cancelar</button>
+      </div>
+    </div>
+    <div *ngIf="investorProposalSent" class="py-4 text-center">
+      <div class="mb-3 text-4xl">✓</div>
+      <h3 class="mb-1 font-bold text-slate-900">Proposta enviada!</h3>
+      <p class="mb-5 text-sm text-slate-500">{{ selectedInvestor?.name }} receberá sua proposta em breve.</p>
+      <button (click)="closeInvestorModal()" class="app-button-primary">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CO-FOUNDER PROPOSAL MODAL ── -->
+<div *ngIf="showCoFounderModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4" (click)="closeCoFounderModal()">
+  <div class="w-full max-w-lg rounded-t-2xl sm:rounded-2xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+    <div *ngIf="!coFounderProposalSent">
+      <h2 class="mb-1 text-lg font-bold text-slate-900">Proposta de co-founder</h2>
+      <p class="mb-5 text-sm text-slate-500">Para {{ proposalTarget?.name }}</p>
+
+      <div class="space-y-3">
+        <div *ngIf="userStartups.length > 0">
+          <label class="mb-1 block text-xs font-semibold text-slate-700">Startup relacionada</label>
+          <select [(ngModel)]="coFounderProposal.startupId" class="app-input w-full">
+            <option value="">Selecionar startup</option>
+            <option *ngFor="let s of userStartups" [value]="s.startupId">{{ s.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-semibold text-slate-700">Pitch <span class="text-red-500">*</span></label>
+          <textarea [(ngModel)]="coFounderProposal.pitch" rows="3" class="app-input w-full" placeholder="Descreva o projeto e o que busca num co-founder..."></textarea>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-700">Cargo esperado</label>
+            <input [(ngModel)]="coFounderProposal.expectedRole" class="app-input w-full" placeholder="Ex: CTO, CMO...">
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-semibold text-slate-700">Dedicação esperada</label>
+            <select [(ngModel)]="coFounderProposal.expectedDedication" class="app-input w-full">
+              <option value="">Selecionar</option>
+              <option value="full-time">Full-time</option>
+              <option value="part-time">Part-time</option>
+              <option value="advisor">Advisor</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-semibold text-slate-700">Oferta de equity (opcional)</label>
+          <input [(ngModel)]="coFounderProposal.equityOffer" class="app-input w-full" placeholder="Ex: 10-20%">
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-3">
+        <button (click)="sendCoFounderProposal()" class="app-button-primary flex-1" [disabled]="sendingCoFounderProposal || !coFounderProposal.pitch?.trim()">
+          {{ sendingCoFounderProposal ? 'Enviando...' : 'Enviar proposta' }}
+        </button>
+        <button (click)="closeCoFounderModal()" class="app-button-secondary">Cancelar</button>
+      </div>
+    </div>
+    <div *ngIf="coFounderProposalSent" class="py-4 text-center">
+      <div class="mb-3 text-4xl">✓</div>
+      <h3 class="mb-1 font-bold text-slate-900">Proposta enviada!</h3>
+      <p class="mb-5 text-sm text-slate-500">{{ proposalTarget?.name }} receberá sua proposta em breve.</p>
+      <button (click)="closeCoFounderModal()" class="app-button-primary">Fechar</button>
+    </div>
+  </div>
 </div>

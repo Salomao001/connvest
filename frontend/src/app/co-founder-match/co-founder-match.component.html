@@ -27,7 +27,7 @@
         Startups buscando ({{ startups.length }})
       </button>
     </div>
-    <select *ngIf="activeTab === 'founders'" [(ngModel)]="areaFilter" (ngModelChange)="loadFounders()" class="app-input w-44">
+    <select *ngIf="activeTab === 'founders'" [(ngModel)]="areaFilter" (ngModelChange)="loadFounders()" class="app-input w-full sm:w-44">
       <option *ngFor="let a of areas" [value]="a.value">{{ a.label }}</option>
     </select>
   </div>

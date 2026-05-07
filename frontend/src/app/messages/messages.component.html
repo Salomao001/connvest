@@ -9,9 +9,11 @@
   <div *ngIf="loading" class="app-card p-8 text-center text-sm text-slate-500">Carregando conversas...</div>
 
   <section *ngIf="!loading" class="app-card overflow-hidden" style="min-height: 580px">
-    <div class="grid" style="grid-template-columns: 280px 1fr; min-height: 580px">
+    <div class="md:grid md:[grid-template-columns:280px_1fr]" style="min-height: 580px">
+
       <!-- Conversation list -->
-      <aside class="border-r border-slate-200 flex flex-col">
+      <aside class="md:flex flex-col border-r border-slate-200"
+             [ngClass]="showChatMobile ? 'hidden' : 'flex'">
         <div class="border-b border-slate-200 p-4">
           <p class="text-sm font-semibold text-slate-700">Conversas</p>
         </div>
@@ -45,9 +47,16 @@
       </aside>
 
       <!-- Chat area -->
-      <main class="flex flex-col">
+      <main class="md:flex flex-col"
+            [ngClass]="showChatMobile ? 'flex' : 'hidden'">
         <ng-container *ngIf="activeConversation; else noConversation">
           <div class="flex items-center gap-3 border-b border-slate-200 p-4">
+            <!-- Back button (mobile only) -->
+            <button (click)="backToList()" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 md:hidden">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+              </svg>
+            </button>
             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-300 text-sm font-bold text-slate-700">
               <ng-container *ngIf="activeConversation.partnerPhoto && activeConversation.partnerPhoto.startsWith('http'); else hi">
                 <img [src]="activeConversation.partnerPhoto" class="h-full w-full rounded-full object-cover" alt="">
@@ -63,7 +72,7 @@
             <div *ngFor="let msg of messages"
               class="flex"
               [ngClass]="isMine(msg) ? 'justify-end' : 'justify-start'">
-              <div class="max-w-[340px] rounded-2xl p-3 text-sm"
+              <div class="max-w-[85%] sm:max-w-[340px] rounded-2xl p-3 text-sm"
                 [ngClass]="isMine(msg) ? 'bg-blue-700 text-white rounded-br-sm' : 'bg-slate-100 text-slate-900 rounded-bl-sm'">
                 <p>{{ msg.content }}</p>
                 <p class="mt-1 text-xs" [ngClass]="isMine(msg) ? 'text-blue-200' : 'text-slate-400'">

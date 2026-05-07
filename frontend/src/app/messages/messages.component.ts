@@ -19,6 +19,7 @@ export class MessagesComponent implements OnInit {
   newMessage = '';
   currentUser: any;
   loading = true;
+  showChatMobile = false;
 
   constructor(
     private messageService: MessageService,
@@ -70,7 +71,12 @@ export class MessagesComponent implements OnInit {
 
   openConversation(conv: any) {
     this.activeConversation = conv;
+    this.showChatMobile = true;
     this.loadThread(conv.partnerId);
+  }
+
+  backToList() {
+    this.showChatMobile = false;
   }
 
   loadThread(partnerId: number) {

@@ -204,7 +204,7 @@
     <div *ngIf="activeTab === 'investor' && isInvestor" class="space-y-4">
       <div class="app-card p-5">
         <h2 class="mb-4 font-bold text-slate-900">Tese de investimento</h2>
-        <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div *ngIf="user.investorType"><span class="text-xs font-semibold uppercase text-slate-400">Tipo</span><p class="mt-0.5 font-medium capitalize">{{ user.investorType }}</p></div>
           <div *ngIf="user.averageTicket"><span class="text-xs font-semibold uppercase text-slate-400">Ticket médio</span><p class="mt-0.5 font-medium text-emerald-700">{{ user.averageTicket }}</p></div>
           <div *ngIf="user.sectorsOfInterest"><span class="text-xs font-semibold uppercase text-slate-400">Setores</span><p class="mt-0.5">{{ user.sectorsOfInterest }}</p></div>

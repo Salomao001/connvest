@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { PostService } from '../services/post.service';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
@@ -9,7 +10,7 @@ import { FollowService } from '../services/follow.service';
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './feed.component.html',
   styleUrl: './feed.component.scss'
 })

@@ -1,0 +1,45 @@
+<div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Minhas startups</h1>
+      <p class="text-sm text-gray-500 mt-1">Startups vinculadas ao seu perfil.</p>
+    </div>
+
+    <a routerLink="/startup/new"
+      class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-md hover:bg-primary-700">
+      Criar startup
+    </a>
+  </div>
+
+  <div *ngIf="loading" class="bg-white border border-gray-200 p-8 text-sm text-gray-500">
+    Carregando startups...
+  </div>
+
+  <div *ngIf="!loading && startups.length" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <a *ngFor="let startup of startups" [routerLink]="['/startup', startup.startupId]"
+      class="block bg-white border border-gray-200 p-5 hover:border-primary-300 hover:bg-primary-50 transition-colors">
+      <div class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <h2 class="text-lg font-bold text-gray-900">{{ startup.name }}</h2>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ startup.sector || 'Setor nao informado' }} <span *ngIf="startup.stage">- {{ startup.stage }}</span>
+          </p>
+        </div>
+        <span class="px-2 py-1 bg-white border border-primary-200 text-primary-700 text-xs font-bold uppercase">
+          {{ startup.role }}
+        </span>
+      </div>
+
+      <p class="text-sm text-gray-700 mt-3 line-clamp-2" *ngIf="startup.description">{{ startup.description }}</p>
+    </a>
+  </div>
+
+  <div *ngIf="!loading && startups.length === 0" class="bg-white border border-dashed border-gray-300 p-10 text-center">
+    <h2 class="text-base font-bold text-gray-900">Nenhuma startup vinculada</h2>
+    <p class="text-sm text-gray-500 mt-2">Crie sua primeira startup para ela aparecer aqui.</p>
+    <a routerLink="/startup/new"
+      class="inline-flex items-center justify-center mt-5 px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-md hover:bg-primary-700">
+      Criar startup
+    </a>
+  </div>
+</div>

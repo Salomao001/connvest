@@ -1,0 +1,43 @@
+<div class="onboarding-container">
+  <div class="onboarding-card">
+    <div class="header">
+      <h1>Como você quer se conectar?</h1>
+      <p>Selecione os perfis que melhor descrevem sua jornada. Isso nos ajuda a personalizar sua experiência.</p>
+    </div>
+
+    <div class="options-grid">
+      @for (opt of profileOptions; track opt.id) {
+        <div 
+          class="option-card" 
+          [class.selected]="isSelected(opt.id)"
+          (click)="toggleSelection(opt.id)"
+        >
+          <div class="icon">{{ opt.icon }}</div>
+          <div class="content">
+            <h3>{{ opt.label }}</h3>
+            <p>{{ opt.description }}</p>
+          </div>
+          <div class="check">
+             @if (isSelected(opt.id)) {
+               <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+             }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="actions">
+      <button 
+        class="btn-primary" 
+        [disabled]="selectedIds.length === 0 || loading"
+        (click)="save()"
+      >
+        @if (loading) {
+          Salvando...
+        } @else {
+          Continuar
+        }
+      </button>
+    </div>
+  </div>
+</div>

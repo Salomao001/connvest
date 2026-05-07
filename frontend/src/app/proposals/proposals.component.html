@@ -1,0 +1,122 @@
+<div class="app-page-narrow">
+  <header class="mb-7">
+    <h1 class="app-title">Propostas</h1>
+    <p class="app-subtitle">Investimento, co-founder e advisor</p>
+  </header>
+
+  <div class="app-tabbar mb-6">
+    <button (click)="activeTab = 'received'" class="app-tab" [ngClass]="activeTab === 'received' ? 'app-tab-active' : ''">
+      Recebidas
+      <span *ngIf="pendingCount > 0" class="ml-1.5 rounded-full bg-blue-700 px-2 py-0.5 text-xs font-bold text-white">{{ pendingCount }}</span>
+    </button>
+    <button (click)="activeTab = 'sent'" class="app-tab" [ngClass]="activeTab === 'sent' ? 'app-tab-active' : ''">
+      Enviadas ({{ sentProposals.length }})
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="app-card p-8 text-center text-sm text-slate-500">Carregando propostas...</div>
+
+  <!-- RECEIVED -->
+  <div *ngIf="!loading && activeTab === 'received'" class="space-y-4">
+    <div *ngIf="receivedCount === 0" class="app-card p-10 text-center">
+      <svg class="h-10 w-10 mx-auto mb-2 text-slate-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+      <h3 class="font-bold text-slate-900">Caixa vazia</h3>
+      <p class="mt-1 text-sm text-slate-500">Nenhuma proposta recebida ainda.</p>
+    </div>
+
+    <!-- Startup invitations -->
+    <article *ngFor="let inv of startupInvitations" class="app-card p-6">
+      <div class="flex items-start gap-4">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+          {{ inv.senderName?.charAt(0) || 'C' }}
+        </div>
+        <div class="flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-bold text-slate-900">{{ inv.senderName }}</h2>
+            <span class="rounded-full bg-blue-700 px-2.5 py-0.5 text-xs font-bold text-white">Convite: {{ inv.role }}</span>
+          </div>
+          <p class="mt-0.5 text-xs text-slate-500">{{ inv.startupName }} · Convite de startup</p>
+          <p class="mt-3 text-sm leading-relaxed text-slate-800">{{ inv.message || 'Convite para participar da startup.' }}</p>
+          <div class="mt-4 flex gap-2" *ngIf="inv.status === 'PENDING'">
+            <button (click)="acceptInvitation(inv.id)" class="app-button-primary text-sm">✓ Aceitar</button>
+            <button (click)="rejectInvitation(inv.id)" class="app-button-secondary text-sm">× Recusar</button>
+          </div>
+          <span *ngIf="inv.status !== 'PENDING'" class="mt-3 inline-flex app-chip">{{ statusLabel(inv.status) }}</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- Proposals (new system + legacy) -->
+    <article *ngFor="let p of proposals" class="app-card p-6">
+      <div class="flex items-start gap-4">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-sm font-bold text-slate-700">
+          <ng-container *ngIf="p.senderPhoto && p.senderPhoto.startsWith('http'); else prop_init">
+            <img [src]="p.senderPhoto" class="h-full w-full object-cover" alt="">
+          </ng-container>
+          <ng-template #prop_init>{{ (p.senderName || 'U').charAt(0) }}</ng-template>
+        </div>
+        <div class="flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-bold text-slate-900">{{ p.senderName }}</h2>
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-bold text-white" [ngClass]="typeColor(p.type || 'DEFAULT')">
+              {{ typeLabel(p.type || p.senderRole || 'Proposta') }}
+            </span>
+            <span *ngIf="p.startupName" class="app-chip text-xs">{{ p.startupName }}</span>
+          </div>
+          <p class="mt-0.5 text-xs text-slate-500">{{ timeAgo(p.createdAt) }}</p>
+
+          <p class="mt-3 text-sm leading-relaxed text-slate-800">{{ p.pitch || p.message }}</p>
+
+          <!-- Investment-specific fields -->
+          <div *ngIf="p.type === 'INVESTMENT'" class="mt-3 space-y-1 text-xs text-slate-600">
+            <p *ngIf="p.seekedValue"><strong>Valor buscado:</strong> {{ p.seekedValue }}</p>
+            <p *ngIf="p.capitalUse"><strong>Uso do capital:</strong> {{ p.capitalUse }}</p>
+            <p *ngIf="p.whyThisInvestor"><strong>Por que você:</strong> {{ p.whyThisInvestor }}</p>
+          </div>
+
+          <!-- Co-founder specific fields -->
+          <div *ngIf="p.type === 'CO_FOUNDER'" class="mt-3 space-y-1 text-xs text-slate-600">
+            <p *ngIf="p.expectedRole"><strong>Papel:</strong> {{ p.expectedRole }}</p>
+            <p *ngIf="p.expectedDedication"><strong>Dedicação:</strong> {{ p.expectedDedication }}</p>
+            <p *ngIf="p.equityOffer"><strong>Equity:</strong> {{ p.equityOffer }}</p>
+          </div>
+
+          <div class="mt-4 flex gap-2" *ngIf="p.status === 'PENDING'">
+            <button (click)="updateStatus(p.id, 'ACCEPTED', !p.type)" class="app-button-primary text-sm">✓ Aceitar conversa</button>
+            <button (click)="updateStatus(p.id, 'REJECTED', !p.type)" class="app-button-secondary text-sm">× Recusar</button>
+            <button (click)="updateStatus(p.id, 'ARCHIVED', !p.type)" class="text-xs text-slate-400 hover:text-slate-600">Arquivar</button>
+          </div>
+          <span *ngIf="p.status !== 'PENDING'" class="mt-3 inline-flex app-chip">{{ statusLabel(p.status) }}</span>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- SENT -->
+  <div *ngIf="!loading && activeTab === 'sent'" class="space-y-4">
+    <div *ngIf="sentProposals.length === 0" class="app-card p-10 text-center">
+      <svg class="h-10 w-10 mx-auto mb-2 text-slate-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+      <h3 class="font-bold text-slate-900">Nenhuma proposta enviada</h3>
+      <p class="mt-1 text-sm text-slate-500">Explore investidores e founders para enviar propostas.</p>
+    </div>
+
+    <article *ngFor="let p of sentProposals" class="app-card p-6">
+      <div class="flex items-start gap-4">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-700">
+          {{ (p.receiverName || 'R').charAt(0) }}
+        </div>
+        <div class="flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-bold text-slate-900">{{ p.receiverName }}</h2>
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-bold text-white" [ngClass]="typeColor(p.type)">
+              {{ typeLabel(p.type) }}
+            </span>
+          </div>
+          <p class="mt-0.5 text-xs text-slate-500">{{ timeAgo(p.createdAt) }}</p>
+          <p class="mt-3 text-sm leading-relaxed text-slate-700">{{ p.pitch }}</p>
+          <span class="mt-3 inline-flex app-chip">{{ statusLabel(p.status) }}</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>

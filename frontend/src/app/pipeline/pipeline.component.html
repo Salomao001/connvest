@@ -1,0 +1,66 @@
+<div class="app-page">
+  <header class="mb-7">
+    <h1 class="app-title">Pipeline</h1>
+    <p class="app-subtitle">Organize as startups do seu interesse</p>
+  </header>
+
+  <div *ngIf="loading" class="py-10 text-center text-sm text-slate-500">Carregando pipeline...</div>
+
+  <div *ngIf="!loading && savedItems.length === 0" class="app-card p-10 text-center">
+    <svg class="h-12 w-12 mx-auto mb-3 text-slate-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
+    </svg>
+    <h3 class="font-bold text-slate-900">Pipeline vazio</h3>
+    <p class="mt-1 text-sm text-slate-500">Salve startups do Descobrir para organizá-las aqui.</p>
+    <a routerLink="/descobrir" class="mt-4 inline-block app-button-primary">Explorar startups</a>
+  </div>
+
+  <!-- Kanban US-045 -->
+  <div *ngIf="!loading && savedItems.length > 0" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div *ngFor="let stage of stages" class="flex flex-col gap-3">
+      <div class="flex items-center gap-2 border-b-2 pb-2" [ngClass]="stage.color">
+        <h3 class="font-semibold text-slate-800">{{ stage.label }}</h3>
+        <span class="ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">
+          {{ getItemsForStage(stage.key).length }}
+        </span>
+      </div>
+
+      <div *ngIf="getItemsForStage(stage.key).length === 0" class="rounded-xl border-2 border-dashed border-slate-200 p-6 text-center text-xs text-slate-400">
+        Nenhuma startup
+      </div>
+
+      <article *ngFor="let item of getItemsForStage(stage.key)" class="app-card p-4">
+        <div class="flex items-start gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white" [ngClass]="logoColor(item.startup?.name || '')">
+            {{ (item.startup?.name || '?').charAt(0) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="font-semibold text-slate-900 text-sm">{{ item.startup?.name }}</h4>
+            <p class="text-xs text-slate-500">{{ item.startup?.sector }} · {{ item.startup?.stage }}</p>
+          </div>
+        </div>
+
+        <p *ngIf="item.startup?.shortDescription" class="mt-2 text-xs text-slate-600 leading-relaxed line-clamp-2">
+          {{ item.startup?.shortDescription }}
+        </p>
+
+        <!-- Move stage -->
+        <div class="mt-3">
+          <select [value]="stage.key" (change)="moveToStage(item, $any($event.target).value)"
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs text-slate-700">
+            <option *ngFor="let s of stages" [value]="s.key" [selected]="s.key === stage.key">{{ s.label }}</option>
+          </select>
+        </div>
+
+        <div class="mt-3 flex gap-2">
+          <a [routerLink]="['/startup', item.startup?.id]" class="app-button-secondary flex-1 text-center text-xs h-8">Ver perfil</a>
+          <button (click)="remove(item)" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-500">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+            </svg>
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>

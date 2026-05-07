@@ -1,0 +1,53 @@
+<div class="min-h-screen flex items-center justify-center bg-corporate-gray">
+  <div class="max-w-md w-full bg-white p-8 border border-corporate-border shadow-sm">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-primary-900 mb-2">CONNINVEST</h1>
+      <p class="text-corporate-dark">Crie sua conta e comece a conectar</p>
+    </div>
+
+    <!-- Mensagem de erro -->
+    <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
+      {{ errorMessage }}
+    </div>
+
+    <form class="space-y-5" (ngSubmit)="onRegister()">
+      <div>
+        <label for="reg-name" class="block text-sm font-medium text-corporate-dark uppercase tracking-wide">Nome completo</label>
+        <div class="mt-1">
+          <input id="reg-name" name="name" type="text" autocomplete="name" required [(ngModel)]="name"
+            class="appearance-none block w-full px-3 py-2 border border-corporate-border focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+        </div>
+      </div>
+
+      <div>
+        <label for="reg-email" class="block text-sm font-medium text-corporate-dark uppercase tracking-wide">E-mail</label>
+        <div class="mt-1">
+          <input id="reg-email" name="email" type="email" autocomplete="email" required [(ngModel)]="email"
+            class="appearance-none block w-full px-3 py-2 border border-corporate-border focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+        </div>
+        <p *ngIf="email && !emailValid" class="mt-1 text-xs text-red-500">Formato de e-mail inválido.</p>
+      </div>
+
+      <div>
+        <label for="reg-password" class="block text-sm font-medium text-corporate-dark uppercase tracking-wide">Senha</label>
+        <div class="mt-1">
+          <input id="reg-password" name="password" type="password" autocomplete="new-password" required [(ngModel)]="password"
+            class="appearance-none block w-full px-3 py-2 border border-corporate-border focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+        </div>
+        <p *ngIf="password && !passwordValid" class="mt-1 text-xs text-red-500">Mínimo de 6 caracteres.</p>
+      </div>
+
+      <div>
+        <button type="submit" [disabled]="loading"
+          class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors uppercase tracking-wide disabled:opacity-50">
+          {{ loading ? 'Criando conta...' : 'Criar conta' }}
+        </button>
+      </div>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-corporate-dark">
+      Já tem conta?
+      <a routerLink="/login" class="text-primary-600 font-medium hover:text-primary-500">Entrar</a>
+    </p>
+  </div>
+</div>

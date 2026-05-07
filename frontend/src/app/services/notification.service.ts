@@ -1,8 +1,9 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const BASE = 'http://localhost:8080/api/notifications';
+const BASE = `${environment.apiUrl}/notifications`;
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -24,3 +25,5 @@ export class NotificationService {
     return this.http.put<any>(`${BASE}/read-all?userId=${userId}`, {});
   }
 }
+
+

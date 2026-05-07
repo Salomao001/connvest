@@ -1,3 +1,4 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -6,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class StartupService {
-  private apiUrl = 'http://localhost:8080/api/startups';
+  private apiUrl = `${environment.apiUrl}/startups`;
 
   constructor(private http: HttpClient) {}
 
@@ -33,7 +34,7 @@ export class StartupService {
   }
 
   inviteMember(startupId: number, senderId: number, receiverId: number, role: string, message: string): Observable<any> {
-    return this.http.post('http://localhost:8080/api/startup-invitations?senderId=' + senderId, {
+    return this.http.post(`${environment.apiUrl}/startup-invitations?senderId=` + senderId, {
       startupId,
       receiverId,
       role,
@@ -42,15 +43,15 @@ export class StartupService {
   }
 
   getStartupInvitationsForUser(userId: number): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/startup-invitations/receiver/${userId}`);
+    return this.http.get<any[]>(`${environment.apiUrl}/startup-invitations/receiver/${userId}`);
   }
 
   acceptStartupInvitation(invitationId: number, userId: number): Observable<any> {
-    return this.http.put(`http://localhost:8080/api/startup-invitations/${invitationId}/accept?userId=${userId}`, {});
+    return this.http.put(`${environment.apiUrl}/startup-invitations/${invitationId}/accept?userId=${userId}`, {});
   }
 
   rejectStartupInvitation(invitationId: number, userId: number): Observable<any> {
-    return this.http.put(`http://localhost:8080/api/startup-invitations/${invitationId}/reject?userId=${userId}`, {});
+    return this.http.put(`${environment.apiUrl}/startup-invitations/${invitationId}/reject?userId=${userId}`, {});
   }
 
   updateMemberRole(startupId: number, memberUserId: number, requesterId: number, role: string): Observable<any> {
@@ -61,3 +62,5 @@ export class StartupService {
     return this.http.delete(`${this.apiUrl}/${startupId}/members/${memberUserId}?requesterId=${requesterId}`);
   }
 }
+
+

@@ -1,8 +1,9 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const BASE = 'http://localhost:8080/api/proposals';
+const BASE = `${environment.apiUrl}/proposals`;
 
 @Injectable({ providedIn: 'root' })
 export class ProposalService {
@@ -24,3 +25,5 @@ export class ProposalService {
     return this.http.put<any>(`${BASE}/${id}/status?status=${status}`, {});
   }
 }
+
+

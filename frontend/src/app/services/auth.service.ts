@@ -1,3 +1,4 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -11,7 +12,7 @@ export interface AuthUser {
   photo?: string;
 }
 
-const API = 'http://localhost:8080/api/users';
+const API = `${environment.apiUrl}/users`;
 const STORAGE_KEY = 'conninvest_user';
 
 @Injectable({ providedIn: 'root' })
@@ -68,3 +69,5 @@ export class AuthService {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
   }
 }
+
+

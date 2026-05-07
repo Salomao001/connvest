@@ -1,8 +1,9 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const BASE = 'http://localhost:8080/api/saved-startups';
+const BASE = `${environment.apiUrl}/saved-startups`;
 
 @Injectable({ providedIn: 'root' })
 export class SavedStartupService {
@@ -28,3 +29,5 @@ export class SavedStartupService {
     return this.http.put<any>(`${BASE}/${savedId}/pipeline?stage=${stage}`, {});
   }
 }
+
+

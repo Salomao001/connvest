@@ -1,3 +1,4 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -6,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ConnectionService {
-  private apiUrl = 'http://localhost:8080/api/connections';
+  private apiUrl = `${environment.apiUrl}/connections`;
 
   constructor(private http: HttpClient) {}
 
@@ -31,3 +32,5 @@ export class ConnectionService {
     return this.http.put<any>(`${this.apiUrl}/${id}/status?status=${status}`, {});
   }
 }
+
+

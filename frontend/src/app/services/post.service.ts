@@ -1,8 +1,9 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const BASE = 'http://localhost:8080/api';
+const BASE = environment.apiUrl;
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
@@ -29,3 +30,5 @@ export class PostService {
     return this.http.post<any>(`${BASE}/posts/${postId}/comments`, comment);
   }
 }
+
+

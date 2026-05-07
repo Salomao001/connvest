@@ -1,8 +1,9 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const BASE = 'http://localhost:8080/api/messages';
+const BASE = `${environment.apiUrl}/messages`;
 
 @Injectable({ providedIn: 'root' })
 export class MessageService {
@@ -24,3 +25,5 @@ export class MessageService {
     return this.http.get<{ count: number }>(`${BASE}/unread-count?userId=${userId}`);
   }
 }
+
+

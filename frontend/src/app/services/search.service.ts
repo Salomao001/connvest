@@ -1,3 +1,4 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { HttpParams } from '@angular/common/http';
@@ -7,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SearchService {
-  private apiUrl = 'http://localhost:8080/api/search';
+  private apiUrl = `${environment.apiUrl}/search`;
 
   constructor(private http: HttpClient) {}
 
@@ -25,3 +26,5 @@ export class SearchService {
     return this.http.get<any[]>(`${this.apiUrl}/cofounders`, { params });
   }
 }
+
+

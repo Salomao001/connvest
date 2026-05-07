@@ -1,8 +1,9 @@
+﻿import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const BASE = 'http://localhost:8080/api/follows';
+const BASE = `${environment.apiUrl}/follows`;
 
 @Injectable({ providedIn: 'root' })
 export class FollowService {
@@ -20,3 +21,5 @@ export class FollowService {
     return this.http.get<any[]>(`${BASE}/following?followerId=${followerId}`);
   }
 }
+
+

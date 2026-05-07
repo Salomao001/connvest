@@ -128,6 +128,7 @@ public class UserController {
                     user.setName(profileRequest.getName().trim());
                     user.setPhoto(profileRequest.getPhoto());
                     user.setBio(profileRequest.getBio());
+                    user.setDescription(profileRequest.getDescription());
                     user.setLocation(profileRequest.getLocation());
                     user.setProfileTypes(profileRequest.getProfileTypes());
                     user.setPastExperiences(profileRequest.getPastExperiences());

@@ -22,8 +22,11 @@ public class User {
     private String password;
     private String photo;
     
-    @Column(length = 1000)
+    @Column(length = 500)
     private String bio;
+
+    @Column(length = 2000)
+    private String description;
     
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_profile_types", joinColumns = @JoinColumn(name = "user_id"))

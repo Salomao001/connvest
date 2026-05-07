@@ -48,4 +48,8 @@ export class LayoutComponent implements OnInit {
   hasProfileType(type: string): boolean {
     return this.authService.getCurrentUser()?.profileTypes?.includes(type) ?? false;
   }
+
+  get isDiscoverPage(): boolean {
+    return this.router.url.startsWith('/descobrir');
+  }
 }

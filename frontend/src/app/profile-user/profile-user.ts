@@ -126,7 +126,8 @@ export class ProfileUser implements OnInit {
 
   get founderScore(): number {
     let score = 40;
-    if (this.user?.bio) score += 10;
+    if (this.user?.bio) score += 5;
+    if (this.user?.description) score += 5;
     if (this.user?.mainSkills) score += 10;
     if (this.user?.pastExperiences) score += 10;
     if (this.userStartups.length > 0) score += 20;
@@ -160,6 +161,7 @@ export class ProfileUser implements OnInit {
       name: user?.name ?? '',
       photo: user?.photo ?? '',
       bio: user?.bio ?? '',
+      description: user?.description ?? '',
       location: user?.location ?? '',
       profileTypesText: (user?.profileTypes ?? []).join(', '),
       pastExperiences: user?.pastExperiences ?? '',

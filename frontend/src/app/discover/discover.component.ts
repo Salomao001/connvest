@@ -13,7 +13,7 @@ import { UserService } from '../services/user.service';
 import { environment } from '../../environments/environment';
 import { AppSelectComponent, SelectOption } from '../shared/app-select.component';
 
-type DiscoverTab = 'startups' | 'pessoas' | 'investidores' | 'cofounders';
+type DiscoverTab = 'todos' | 'startups' | 'pessoas' | 'investidores' | 'cofounders';
 
 @Component({
   selector: 'app-discover',
@@ -23,7 +23,7 @@ type DiscoverTab = 'startups' | 'pessoas' | 'investidores' | 'cofounders';
   styleUrl: './discover.component.scss'
 })
 export class DiscoverComponent implements OnInit {
-  activeTab: DiscoverTab = 'startups';
+  activeTab: DiscoverTab = 'todos';
   searchQuery = '';
   loading = false;
 
@@ -45,6 +45,8 @@ export class DiscoverComponent implements OnInit {
   loadingCoFounders = false;
   coFounderArea = '';
   coFounderDedication = '';
+
+  loadedTabs = new Set<DiscoverTab>();
 
   currentUser: any;
   userStartups: any[] = [];
@@ -143,17 +145,24 @@ export class DiscoverComponent implements OnInit {
 
   setTab(tab: DiscoverTab) {
     this.activeTab = tab;
-    this.searchQuery = '';
     this.loadActiveTab();
   }
 
   loadActiveTab() {
     switch (this.activeTab) {
+      case 'todos': this.loadAll(); break;
       case 'startups': this.loadStartups(); break;
       case 'pessoas': this.loadPeople(); break;
       case 'investidores': this.loadInvestors(); break;
       case 'cofounders': this.loadCoFounders(); break;
     }
+  }
+
+  loadAll() {
+    this.loadStartups();
+    this.loadPeople();
+    this.loadInvestors();
+    this.loadCoFounders();
   }
 
   onSearch() { this.loadActiveTab(); }
@@ -183,6 +192,7 @@ export class DiscoverComponent implements OnInit {
         next: (startups: any[]) => {
           this.startups = this.sectorFilter ? startups.filter(s => s.sector === this.sectorFilter) : startups;
           this.loadingStartups = false;
+          this.loadedTabs.add('startups');
         },
         error: () => { this.loadingStartups = false; }
       });
@@ -197,6 +207,7 @@ export class DiscoverComponent implements OnInit {
         if (this.profileTypeFilter) result = result.filter(u => u.profileTypes?.includes(this.profileTypeFilter));
         this.users = result;
         this.loading = false;
+        this.loadedTabs.add('pessoas');
       },
       error: () => { this.loading = false; }
     });
@@ -206,7 +217,7 @@ export class DiscoverComponent implements OnInit {
     this.loadingInvestors = true;
     const url = `${environment.apiUrl}/search/investors?q=${encodeURIComponent(this.searchQuery)}&type=${this.investorTypeFilter}&sector=${encodeURIComponent(this.investorSectorFilter)}&stage=${encodeURIComponent(this.investorStageFilter)}`;
     this.http.get<any[]>(url).subscribe({
-      next: data => { this.investors = data; this.loadingInvestors = false; },
+      next: data => { this.investors = data; this.loadingInvestors = false; this.loadedTabs.add('investidores'); },
       error: () => { this.loadingInvestors = false; }
     });
   }
@@ -220,6 +231,7 @@ export class DiscoverComponent implements OnInit {
         if (this.searchQuery) result = result.filter(u => u.name?.toLowerCase().includes(this.searchQuery.toLowerCase()));
         this.coFounderUsers = result;
         this.loadingCoFounders = false;
+        this.loadedTabs.add('cofounders');
       },
       error: () => { this.loadingCoFounders = false; }
     });

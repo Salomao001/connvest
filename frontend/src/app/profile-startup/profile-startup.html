@@ -90,9 +90,8 @@
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label class="block"><span class="label">Nome *</span><input name="name" [(ngModel)]="startupForm.name" class="app-input mt-1 w-full bg-white"></label>
         <label class="block"><span class="label">Logo (URL)</span><input name="logo" [(ngModel)]="startupForm.logo" class="app-input mt-1 w-full bg-white" placeholder="https://..."></label>
-        <label class="block md:col-span-2"><span class="label">Descrição curta</span><input name="shortDescription" [(ngModel)]="startupForm.shortDescription" class="app-input mt-1 w-full bg-white"></label>
-        <label class="block md:col-span-2"><span class="label">Descrição</span><textarea name="description" [(ngModel)]="startupForm.description" rows="3" class="app-input mt-1 w-full bg-white"></textarea></label>
-        <label class="block md:col-span-2"><span class="label">Descrição completa</span><textarea name="fullDescription" [(ngModel)]="startupForm.fullDescription" rows="3" class="app-input mt-1 w-full bg-white"></textarea></label>
+        <label class="block md:col-span-2"><span class="label">Bio <span class="text-slate-400 font-normal text-xs">(tagline curto)</span></span><input name="shortDescription" [(ngModel)]="startupForm.shortDescription" class="app-input mt-1 w-full bg-white" placeholder="Ex: Plataforma de crédito para pequenas empresas"></label>
+        <label class="block md:col-span-2"><span class="label">Descrição</span><textarea name="description" [(ngModel)]="startupForm.description" rows="4" class="app-input mt-1 w-full bg-white" placeholder="Descreva com mais detalhes sua startup, modelo de negócio e diferenciais..."></textarea></label>
         <label class="block"><span class="label">Setor</span><input name="sector" [(ngModel)]="startupForm.sector" class="app-input mt-1 w-full bg-white"></label>
         <label class="block">
           <span class="label">Estágio</span>
@@ -174,10 +173,10 @@
         </div>
       </section>
 
-      <!-- Full description -->
-      <section *ngIf="startup.fullDescription" class="app-card p-5">
+      <!-- Description -->
+      <section *ngIf="startup.description" class="app-card p-5">
         <h2 class="mb-3 font-bold text-slate-900">Sobre a startup</h2>
-        <p class="text-sm leading-relaxed text-slate-700 whitespace-pre-line">{{ startup.fullDescription }}</p>
+        <p class="text-sm leading-relaxed text-slate-700 whitespace-pre-line">{{ startup.description }}</p>
       </section>
 
       <!-- Objective -->
@@ -202,14 +201,16 @@
         <h2 class="mb-4 font-bold text-slate-900">Equipe</h2>
         <div class="space-y-3">
           <div *ngFor="let member of members" class="flex items-center gap-4 border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-sm font-bold text-slate-700">
-              <img *ngIf="member.photo && member.photo.startsWith('http')" [src]="member.photo" class="h-full w-full object-cover" alt="">
-              <span *ngIf="!member.photo || !member.photo.startsWith('http')">{{ member.name?.charAt(0) }}</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-semibold text-slate-900">{{ member.name }}</p>
-              <p class="text-xs text-slate-500">{{ member.email }}</p>
-            </div>
+            <a [routerLink]="['/user', member.userId]" class="flex items-center gap-4 flex-1 min-w-0 hover:opacity-80">
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-sm font-bold text-slate-700">
+                <img *ngIf="member.photo && member.photo.startsWith('http')" [src]="member.photo" class="h-full w-full object-cover" alt="">
+                <span *ngIf="!member.photo || !member.photo.startsWith('http')">{{ member.name?.charAt(0) }}</span>
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold text-slate-900">{{ member.name }}</p>
+                <p class="text-xs text-slate-500">{{ member.email }}</p>
+              </div>
+            </a>
             <div class="flex items-center gap-2">
               <select *ngIf="canManageMembers() && member.role !== 'Owner'; else roleBadge"
                 [ngModel]="member.role" (ngModelChange)="updateMemberRole(member, $event)"

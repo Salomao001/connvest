@@ -70,7 +70,8 @@
         <label class="block"><span class="label">URL da foto</span><input [(ngModel)]="profileForm.photo" name="photo" class="app-input mt-1 w-full bg-white" placeholder="https://..."></label>
         <label class="block"><span class="label">Localização</span><input [(ngModel)]="profileForm.location" name="location" class="app-input mt-1 w-full bg-white"></label>
         <label class="block"><span class="label">Tipo de perfil (separado por vírgula)</span><input [(ngModel)]="profileForm.profileTypesText" name="profileTypesText" class="app-input mt-1 w-full bg-white" placeholder="Founder, Investidor..."></label>
-        <label class="block md:col-span-2"><span class="label">Bio</span><textarea [(ngModel)]="profileForm.bio" name="bio" rows="3" class="app-input mt-1 w-full bg-white" placeholder="Conte sobre você..."></textarea></label>
+        <label class="block md:col-span-2"><span class="label">Bio <span class="text-slate-400 font-normal text-xs">(aparece no cabeçalho)</span></span><input [(ngModel)]="profileForm.bio" name="bio" class="app-input mt-1 w-full bg-white" placeholder="Ex: Founder e engenheiro apaixonado por IA"></label>
+        <label class="block md:col-span-2"><span class="label">Descrição</span><textarea [(ngModel)]="profileForm.description" name="description" rows="4" class="app-input mt-1 w-full bg-white" placeholder="Conte mais sobre você, sua trajetória e o que te motiva..."></textarea></label>
         <label class="block md:col-span-2"><span class="label">Experiências anteriores</span><textarea [(ngModel)]="profileForm.pastExperiences" name="pastExperiences" rows="2" class="app-input mt-1 w-full bg-white"></textarea></label>
         <label class="block"><span class="label">Skills (separadas por vírgula)</span><input [(ngModel)]="profileForm.mainSkills" name="mainSkills" class="app-input mt-1 w-full bg-white"></label>
         <label class="block"><span class="label">Interesses</span><input [(ngModel)]="profileForm.interests" name="interests" class="app-input mt-1 w-full bg-white"></label>
@@ -158,6 +159,11 @@
 
     <!-- About tab -->
     <div *ngIf="activeTab === 'about'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <section *ngIf="user.description" class="app-card p-5 md:col-span-2">
+        <h2 class="mb-3 font-bold text-slate-900">Sobre mim</h2>
+        <p class="text-sm leading-relaxed text-slate-700 whitespace-pre-line">{{ user.description }}</p>
+      </section>
+
       <section class="app-card p-5">
         <h2 class="mb-4 font-bold text-slate-900">Skills principais</h2>
         <div class="flex flex-wrap gap-2">

@@ -18,7 +18,6 @@ export class CreateStartupComponent {
     logo: '',
     shortDescription: '',
     description: '',
-    fullDescription: '',
     sector: '',
     stage: '',
     location: '',

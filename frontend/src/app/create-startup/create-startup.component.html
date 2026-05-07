@@ -19,20 +19,16 @@
       </label>
 
       <label class="block md:col-span-2">
-        <span class="text-sm font-semibold text-gray-700">Descricao curta</span>
+        <span class="text-sm font-semibold text-gray-700">Bio <span class="text-gray-400 font-normal text-xs">(tagline curto)</span></span>
         <input name="shortDescription" [(ngModel)]="startupForm.shortDescription"
+          placeholder="Ex: Plataforma de crédito para pequenas empresas"
           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-primary-500">
       </label>
 
       <label class="block md:col-span-2">
-        <span class="text-sm font-semibold text-gray-700">Descricao</span>
-        <textarea name="description" [(ngModel)]="startupForm.description" rows="3"
-          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
-      </label>
-
-      <label class="block md:col-span-2">
-        <span class="text-sm font-semibold text-gray-700">Descricao completa</span>
-        <textarea name="fullDescription" [(ngModel)]="startupForm.fullDescription" rows="4"
+        <span class="text-sm font-semibold text-gray-700">Descrição</span>
+        <textarea name="description" [(ngModel)]="startupForm.description" rows="4"
+          placeholder="Descreva sua startup, modelo de negócio e diferenciais..."
           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
       </label>
 

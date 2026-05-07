@@ -11,13 +11,14 @@ import { FollowService } from '../services/follow.service';
 import { ProposalService } from '../services/proposal.service';
 import { UserService } from '../services/user.service';
 import { environment } from '../../environments/environment';
+import { AppSelectComponent, SelectOption } from '../shared/app-select.component';
 
 type DiscoverTab = 'startups' | 'pessoas' | 'investidores' | 'cofounders';
 
 @Component({
   selector: 'app-discover',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AppSelectComponent],
   templateUrl: './discover.component.html',
   styleUrl: './discover.component.scss'
 })
@@ -347,6 +348,22 @@ export class DiscoverComponent implements OnInit {
   logoColor(name: string): string {
     const colors = ['bg-blue-700', 'bg-emerald-600', 'bg-teal-600', 'bg-orange-500', 'bg-violet-600'];
     return colors[(name?.charCodeAt(0) || 0) % colors.length];
+  }
+
+  get startupOptions(): SelectOption[] {
+    return [
+      { value: '', label: 'Selecionar startup' },
+      ...this.userStartups.map(s => ({ value: String(s.startupId), label: s.name }))
+    ];
+  }
+
+  get dedicationOptions(): SelectOption[] {
+    return [
+      { value: '', label: 'Selecionar' },
+      { value: 'full-time', label: 'Full-time' },
+      { value: 'part-time', label: 'Part-time' },
+      { value: 'advisor', label: 'Advisor' }
+    ];
   }
 
   getInitial(name: string): string { return (name || 'U').charAt(0).toUpperCase(); }

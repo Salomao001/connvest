@@ -6,11 +6,12 @@ import { PostService } from '../services/post.service';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { FollowService } from '../services/follow.service';
+import { AppSelectComponent } from '../shared/app-select.component';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, AppSelectComponent],
   templateUrl: './feed.component.html',
   styleUrl: './feed.component.scss'
 })
@@ -115,6 +116,13 @@ export class FeedComponent implements OnInit {
   followStartup(post: any) {
     if (!this.currentUser || !post.startupId) return;
     this.followService.toggleFollow(this.currentUser.id, 'STARTUP', post.startupId).subscribe();
+  }
+
+  get authorOptions() {
+    return [
+      { value: 'PERSONAL', label: `Publicar como ${this.currentUser?.name || 'perfil pessoal'}` },
+      ...this.startupPostOptions.map(s => ({ value: String(s.startupId), label: `Publicar como ${s.name}` }))
+    ];
   }
 
   toggleStructuredUpdate() { this.isStructuredUpdate = !this.isStructuredUpdate; }

@@ -9,10 +9,7 @@
           </div>
           <div class="flex-1">
             <div class="mb-3" *ngIf="startupPostOptions.length > 0">
-              <select [(ngModel)]="selectedAuthor" class="app-input h-9 w-full max-w-[280px] bg-white text-xs font-semibold">
-                <option value="PERSONAL">Publicar como {{ currentUser?.name || 'perfil pessoal' }}</option>
-                <option *ngFor="let startup of startupPostOptions" [value]="startup.startupId">Publicar como {{ startup.name }}</option>
-              </select>
+              <app-select [(ngModel)]="selectedAuthor" [options]="authorOptions" class="w-full max-w-[320px]"></app-select>
             </div>
 
             <div class="rounded-lg bg-slate-100 p-3">

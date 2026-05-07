@@ -37,45 +37,37 @@
 
       <!-- Startups filters -->
       <ng-container *ngIf="activeTab === 'startups'">
-        <select [(ngModel)]="stageFilter" (ngModelChange)="loadStartups()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
-          <option *ngFor="let s of startupStages" [value]="s.value">{{ s.label }}</option>
-        </select>
-        <select [(ngModel)]="sectorFilter" (ngModelChange)="loadStartups()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
-          <option value="">Todos os setores</option>
-          <option *ngFor="let s of startupSectors.slice(1)" [value]="s">{{ s }}</option>
-        </select>
+        <app-select [(ngModel)]="stageFilter" (ngModelChange)="loadStartups()"
+          [options]="startupStages" class="flex-1 min-w-[155px]"></app-select>
+        <app-select [(ngModel)]="sectorFilter" (ngModelChange)="loadStartups()"
+          [options]="[{value:'',label:'Todos os setores'}, ...startupSectors.slice(1).map(s=>({value:s,label:s}))]"
+          class="flex-1 min-w-[155px]"></app-select>
       </ng-container>
 
       <!-- Pessoas filters -->
       <ng-container *ngIf="activeTab === 'pessoas'">
-        <select [(ngModel)]="profileTypeFilter" (ngModelChange)="loadPeople()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
-          <option *ngFor="let p of profileTypes" [value]="p.value">{{ p.label }}</option>
-        </select>
+        <app-select [(ngModel)]="profileTypeFilter" (ngModelChange)="loadPeople()"
+          [options]="profileTypes" class="flex-1 min-w-[155px]"></app-select>
       </ng-container>
 
       <!-- Investidores filters -->
       <ng-container *ngIf="activeTab === 'investidores'">
-        <select [(ngModel)]="investorTypeFilter" (ngModelChange)="loadInvestors()" class="app-input h-10 flex-1 min-w-[140px] bg-white">
-          <option *ngFor="let t of investorTypes" [value]="t.value">{{ t.label }}</option>
-        </select>
-        <select [(ngModel)]="investorSectorFilter" (ngModelChange)="loadInvestors()" class="app-input h-10 flex-1 min-w-[140px] bg-white">
-          <option value="">Todos os setores</option>
-          <option *ngFor="let s of investorSectors.slice(1)" [value]="s">{{ s }}</option>
-        </select>
-        <select [(ngModel)]="investorStageFilter" (ngModelChange)="loadInvestors()" class="app-input h-10 flex-1 min-w-[140px] bg-white">
-          <option value="">Todos os estágios</option>
-          <option *ngFor="let s of investorStages.slice(1)" [value]="s">{{ s }}</option>
-        </select>
+        <app-select [(ngModel)]="investorTypeFilter" (ngModelChange)="loadInvestors()"
+          [options]="investorTypes" class="flex-1 min-w-[140px]"></app-select>
+        <app-select [(ngModel)]="investorSectorFilter" (ngModelChange)="loadInvestors()"
+          [options]="[{value:'',label:'Todos os setores'}, ...investorSectors.slice(1).map(s=>({value:s,label:s}))]"
+          class="flex-1 min-w-[140px]"></app-select>
+        <app-select [(ngModel)]="investorStageFilter" (ngModelChange)="loadInvestors()"
+          [options]="[{value:'',label:'Todos os estágios'}, ...investorStages.slice(1).map(s=>({value:s,label:s}))]"
+          class="flex-1 min-w-[140px]"></app-select>
       </ng-container>
 
       <!-- Co-founders filters -->
       <ng-container *ngIf="activeTab === 'cofounders'">
-        <select [(ngModel)]="coFounderArea" (ngModelChange)="loadCoFounders()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
-          <option *ngFor="let a of coFounderAreas" [value]="a.value">{{ a.label }}</option>
-        </select>
-        <select [(ngModel)]="coFounderDedication" (ngModelChange)="loadCoFounders()" class="app-input h-10 flex-1 min-w-[155px] bg-white">
-          <option *ngFor="let d of coFounderDedications" [value]="d.value">{{ d.label }}</option>
-        </select>
+        <app-select [(ngModel)]="coFounderArea" (ngModelChange)="loadCoFounders()"
+          [options]="coFounderAreas" class="flex-1 min-w-[155px]"></app-select>
+        <app-select [(ngModel)]="coFounderDedication" (ngModelChange)="loadCoFounders()"
+          [options]="coFounderDedications" class="flex-1 min-w-[155px]"></app-select>
       </ng-container>
     </div>
   </section>
@@ -285,10 +277,7 @@
       <div class="space-y-3">
         <div *ngIf="userStartups.length > 0">
           <label class="mb-1 block text-xs font-semibold text-slate-700">Startup relacionada</label>
-          <select [(ngModel)]="investorProposal.startupId" class="app-input w-full">
-            <option value="">Selecionar startup</option>
-            <option *ngFor="let s of userStartups" [value]="s.startupId">{{ s.name }}</option>
-          </select>
+          <app-select [(ngModel)]="investorProposal.startupId" [options]="startupOptions" class="w-full"></app-select>
         </div>
         <div>
           <label class="mb-1 block text-xs font-semibold text-slate-700">Pitch <span class="text-red-500">*</span></label>
@@ -340,10 +329,7 @@
       <div class="space-y-3">
         <div *ngIf="userStartups.length > 0">
           <label class="mb-1 block text-xs font-semibold text-slate-700">Startup relacionada</label>
-          <select [(ngModel)]="coFounderProposal.startupId" class="app-input w-full">
-            <option value="">Selecionar startup</option>
-            <option *ngFor="let s of userStartups" [value]="s.startupId">{{ s.name }}</option>
-          </select>
+          <app-select [(ngModel)]="coFounderProposal.startupId" [options]="startupOptions" class="w-full"></app-select>
         </div>
         <div>
           <label class="mb-1 block text-xs font-semibold text-slate-700">Pitch <span class="text-red-500">*</span></label>
@@ -356,12 +342,7 @@
           </div>
           <div>
             <label class="mb-1 block text-xs font-semibold text-slate-700">Dedicação esperada</label>
-            <select [(ngModel)]="coFounderProposal.expectedDedication" class="app-input w-full">
-              <option value="">Selecionar</option>
-              <option value="full-time">Full-time</option>
-              <option value="part-time">Part-time</option>
-              <option value="advisor">Advisor</option>
-            </select>
+            <app-select [(ngModel)]="coFounderProposal.expectedDedication" [options]="dedicationOptions" class="w-full"></app-select>
           </div>
         </div>
         <div>

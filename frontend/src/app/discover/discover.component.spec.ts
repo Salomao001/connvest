@@ -65,14 +65,14 @@ describe('DiscoverComponent - US-004/US-008', () => {
 
   it('deve recarregar lista ao filtrar por area desejada', () => {
     component.coFounderArea = 'tech';
-    component.onCoFounderAreaChange();
+    component.loadCoFounders();
 
     expect(mockSearchService.searchCoFounders).toHaveBeenLastCalledWith('tech');
   });
 
   it('deve carregar startups por estagio quando filtro muda sem busca textual', () => {
     component.stageFilter = 'MVP';
-    component.onStageChange();
+    component.loadStartups();
 
     expect(mockStartupService.getStartups).toHaveBeenLastCalledWith('MVP');
     expect(component.startups[0].stage).toBe('MVP');
@@ -90,7 +90,7 @@ describe('DiscoverComponent - US-004/US-008', () => {
     component.searchQuery = 'Startup';
     component.stageFilter = 'MVP';
 
-    component.performSearch();
+    component.loadStartups();
 
     expect(component.startups.length).toBe(1);
     expect(component.startups[0].name).toBe('Startup MVP');

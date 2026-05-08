@@ -1,11 +1,9 @@
-﻿import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class StartupService {
   private apiUrl = `${environment.apiUrl}/startups`;
 
@@ -33,13 +31,45 @@ export class StartupService {
     return this.http.get<any[]>(`${this.apiUrl}/${id}/members`);
   }
 
+  // --- Cap Table ---
+  getCapTable(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${id}/cap-table`);
+  }
+
+  saveCapTable(id: number, userId: number, entries: any[]): Observable<any[]> {
+    return this.http.put<any[]>(`${this.apiUrl}/${id}/cap-table?userId=${userId}`, entries);
+  }
+
+  // --- Riscos ---
+  getRisks(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${id}/risks`);
+  }
+
+  saveRisks(id: number, userId: number, risks: any[]): Observable<any[]> {
+    return this.http.put<any[]>(`${this.apiUrl}/${id}/risks?userId=${userId}`, risks);
+  }
+
+  // --- Niche Data ---
+  getNicheData(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${id}/niche-data`);
+  }
+
+  saveNicheData(id: number, nicheKey: string, userId: number, values: Record<string, string>): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/niche-data/${nicheKey}?userId=${userId}`, values);
+  }
+
+  deleteNicheData(id: number, nicheKey: string, userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}/niche-data/${nicheKey}?userId=${userId}`);
+  }
+
+  // --- Nichos config ---
+  getNiches(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/niches`);
+  }
+
+  // --- Membros ---
   inviteMember(startupId: number, senderId: number, receiverId: number, role: string, message: string): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/startup-invitations?senderId=` + senderId, {
-      startupId,
-      receiverId,
-      role,
-      message
-    });
+    return this.http.post(`${environment.apiUrl}/startup-invitations?senderId=${senderId}`, { startupId, receiverId, role, message });
   }
 
   getStartupInvitationsForUser(userId: number): Observable<any[]> {
@@ -62,5 +92,3 @@ export class StartupService {
     return this.http.delete(`${this.apiUrl}/${startupId}/members/${memberUserId}?requesterId=${requesterId}`);
   }
 }
-
-

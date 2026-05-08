@@ -61,13 +61,13 @@ describe('ProposalsComponent - US-010', () => {
   });
 
   it('deve aceitar convite de startup usando o usuario atual', () => {
-    component.acceptStartupInvitation(5);
+    component.acceptInvitation(5);
 
     expect(mockStartupService.acceptStartupInvitation).toHaveBeenCalledWith(5, 9);
   });
 
   it('deve recusar convite de startup usando o usuario atual', () => {
-    component.rejectStartupInvitation(5);
+    component.rejectInvitation(5);
 
     expect(mockStartupService.rejectStartupInvitation).toHaveBeenCalledWith(5, 9);
   });

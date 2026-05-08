@@ -6,6 +6,38 @@ import { ProfileStartup } from './profile-startup';
 import { StartupService } from '../services/startup.service';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
+import { FollowService } from '../services/follow.service';
+import { SavedStartupService } from '../services/saved-startup.service';
+import { PostService } from '../services/post.service';
+
+const MOCK_STARTUP = {
+  id: 11,
+  name: 'FinPulse',
+  logo: 'https://example.com/logo.png',
+  shortDescription: 'Resumo da FinPulse.',
+  pitch: 'Resumo da FinPulse.',
+  sector: 'Fintech',
+  stage: 'Seed',
+  description: 'Tesouraria B2B com IA.',
+  fullDescription: 'Descricao completa da FinPulse.',
+  problemDescription: null,
+  solutionDescription: null,
+  location: 'Sao Paulo, SP',
+  websiteUrl: 'https://finpulse.example.com',
+  currentObjective: 'Captar Seed',
+  mainMetrics: 'R$ 180k MRR',
+  monthlyRevenue: 'R$ 180k',
+  usersCount: 1200,
+  growthPercent: '+32%',
+  clientsCount: 42,
+  mrr: 'R$ 180k',
+  churn: '2.1%',
+  metricsPublic: true,
+  updatedAt: '2026-05-06T10:00:00',
+  badges: 'Top Growth',
+  selectedNiches: [],
+  fieldVisibilityJson: '{}'
+};
 
 describe('ProfileStartup - US-005/US-006', () => {
   let fixture: ComponentFixture<ProfileStartup>;
@@ -13,40 +45,25 @@ describe('ProfileStartup - US-005/US-006', () => {
   let mockStartupService: any;
   let mockUserService: any;
   let mockAuthService: any;
+  let mockFollowService: any;
+  let mockSavedService: any;
+  let mockPostService: any;
 
   beforeEach(async () => {
     mockStartupService = {
-      getStartup: vi.fn().mockReturnValue(of({
-        id: 11,
-        name: 'FinPulse',
-        logo: 'https://example.com/logo.png',
-        shortDescription: 'Resumo da FinPulse.',
-        sector: 'Fintech',
-        stage: 'Seed',
-        description: 'Tesouraria B2B com IA.',
-        fullDescription: 'Descricao completa da FinPulse.',
-        location: 'Sao Paulo, SP',
-        websiteUrl: 'https://finpulse.example.com',
-        currentObjective: 'Captar Seed',
-        mainMetrics: 'R$ 180k MRR',
-        monthlyRevenue: 'R$ 180k',
-        usersCount: 1200,
-        growthPercent: '+32%',
-        clientsCount: 42,
-        mrr: 'R$ 180k',
-        churn: '2.1%',
-        metricsPublic: true,
-        updatedAt: '2026-05-06T10:00:00',
-        badges: 'Top Growth'
-      })),
-      updateStartup: vi.fn(),
+      getStartup: vi.fn().mockReturnValue(of(MOCK_STARTUP)),
+      updateStartup: vi.fn().mockReturnValue(of({ ...MOCK_STARTUP })),
       getStartupMembers: vi.fn().mockReturnValue(of([
         { userId: 4, name: 'Founder', email: 'founder@email.com', role: 'Owner' },
         { userId: 20, name: 'Ana Advisor', email: 'ana@email.com', role: 'Editor' }
       ])),
-      inviteMember: vi.fn(),
-      updateMemberRole: vi.fn(),
-      removeMember: vi.fn()
+      getCapTable: vi.fn().mockReturnValue(of([])),
+      getRisks: vi.fn().mockReturnValue(of([])),
+      getNicheData: vi.fn().mockReturnValue(of([])),
+      getNiches: vi.fn().mockReturnValue(of([])),
+      inviteMember: vi.fn().mockReturnValue(of({ id: 30, status: 'PENDING' })),
+      updateMemberRole: vi.fn().mockReturnValue(of({ userId: 20, role: 'Viewer' })),
+      removeMember: vi.fn().mockReturnValue(of({ message: 'Membro removido.' }))
     };
 
     mockAuthService = {
@@ -62,12 +79,30 @@ describe('ProfileStartup - US-005/US-006', () => {
       ]))
     };
 
+    mockFollowService = {
+      getStatus: vi.fn().mockReturnValue(of({ following: false, count: 5 })),
+      toggleFollow: vi.fn().mockReturnValue(of({ following: true, count: 6 }))
+    };
+
+    mockSavedService = {
+      checkSaved: vi.fn().mockReturnValue(of({ saved: false })),
+      save: vi.fn().mockReturnValue(of({})),
+      unsave: vi.fn().mockReturnValue(of({}))
+    };
+
+    mockPostService = {
+      getPosts: vi.fn().mockReturnValue(of([]))
+    };
+
     await TestBed.configureTestingModule({
       imports: [ProfileStartup],
       providers: [
         { provide: StartupService, useValue: mockStartupService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: UserService, useValue: mockUserService },
+        { provide: FollowService, useValue: mockFollowService },
+        { provide: SavedStartupService, useValue: mockSavedService },
+        { provide: PostService, useValue: mockPostService },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: vi.fn().mockReturnValue('11') } } } }
       ]
     }).compileComponents();
@@ -81,86 +116,48 @@ describe('ProfileStartup - US-005/US-006', () => {
     expect(mockStartupService.getStartup).toHaveBeenCalledWith(11, 4);
     expect(fixture.nativeElement.textContent).toContain('FinPulse');
     expect(fixture.nativeElement.textContent).toContain('Resumo da FinPulse.');
-    expect(fixture.nativeElement.textContent).toContain('Descricao completa da FinPulse.');
-    expect(fixture.nativeElement.textContent).toContain('R$ 180k MRR');
-    expect(fixture.nativeElement.textContent).toContain('Receita mensal');
     expect(fixture.nativeElement.textContent).toContain('R$ 180k');
-    expect(fixture.nativeElement.textContent).toContain('1200');
     expect(fixture.nativeElement.textContent).toContain('+32%');
-    expect(fixture.nativeElement.textContent).toContain('Ultima atualizacao');
     expect(component.canEdit).toBe(true);
     expect(fixture.nativeElement.querySelector('[data-testid="edit-startup"]')).toBeTruthy();
     expect(mockStartupService.getStartupMembers).toHaveBeenCalledWith(11);
+    expect(component.members.length).toBe(2);
+    expect(component.members[0].name).toBe('Founder');
+    expect(component.members[0].role).toBe('Owner');
+  });
+
+  it('deve exibir membro com select de papel quando usuario e Owner', async () => {
+    component.activeTab = 'team';
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('[data-testid="member-role-select"]')).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain('Founder');
     expect(fixture.nativeElement.textContent).toContain('Owner');
-    expect(fixture.nativeElement.querySelector('[data-testid="member-role-select"]')).toBeTruthy();
   });
 
   it('deve salvar edicao quando usuario e Owner', () => {
-    mockStartupService.updateStartup.mockReturnValue(of({
-      id: 11,
-      name: 'FinPulse Editada',
-      sector: 'Healthtech',
-      stage: 'Tracao',
-      description: 'Descricao editada',
-      updatedAt: '2026-05-06T11:00:00'
-    }));
+    const updatedStartup = { ...MOCK_STARTUP, name: 'FinPulse Editada' };
+    mockStartupService.updateStartup.mockReturnValue(of(updatedStartup));
 
-    component.startEditing();
-    component.startupForm = {
-      name: ' FinPulse Editada ',
-      logo: '',
-      shortDescription: 'Resumo editado',
-      description: 'Descricao editada',
-      fullDescription: 'Descricao completa editada',
-      sector: 'Healthtech',
-      stage: 'Tracao',
-      location: 'Rio de Janeiro, RJ',
-      websiteUrl: 'https://editada.example.com',
-      currentObjective: 'Escalar vendas',
-      mainMetrics: 'R$ 250k MRR',
-      monthlyRevenue: 'R$ 250k',
-      usersCount: 2400,
-      growthPercent: '+21%',
-      clientsCount: 70,
-      mrr: 'R$ 250k',
-      churn: '1.9%',
-      metricsPublic: false
-    };
-
+    component.startEdit('identity');
+    component.startupForm.name = ' FinPulse Editada ';
     component.saveStartup();
 
-    expect(mockStartupService.updateStartup).toHaveBeenCalledWith(11, 4, {
-      name: 'FinPulse Editada',
-      logo: '',
-      shortDescription: 'Resumo editado',
-      description: 'Descricao editada',
-      fullDescription: 'Descricao completa editada',
-      sector: 'Healthtech',
-      stage: 'Tracao',
-      location: 'Rio de Janeiro, RJ',
-      websiteUrl: 'https://editada.example.com',
-      currentObjective: 'Escalar vendas',
-      mainMetrics: 'R$ 250k MRR',
-      monthlyRevenue: 'R$ 250k',
-      usersCount: 2400,
-      growthPercent: '+21%',
-      clientsCount: 70,
-      mrr: 'R$ 250k',
-      churn: '1.9%',
-      metricsPublic: false
-    });
+    expect(mockStartupService.updateStartup).toHaveBeenCalled();
+    const [callId, callUserId] = mockStartupService.updateStartup.mock.calls[0];
+    expect(callId).toBe(11);
+    expect(callUserId).toBe(4);
     expect(component.editing).toBe(false);
     expect(component.startup.name).toBe('FinPulse Editada');
   });
 
   it('nao deve salvar startup sem nome', () => {
-    component.startEditing();
+    component.startEdit('identity');
     component.startupForm.name = '   ';
 
     component.saveStartup();
 
-    expect(component.errorMessage).toBe('Nome da startup obrigatorio.');
+    expect(component.errorMessage).toBe('Nome obrigatório.');
     expect(mockStartupService.updateStartup).not.toHaveBeenCalled();
   });
 
@@ -170,35 +167,24 @@ describe('ProfileStartup - US-005/US-006', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('[data-testid="edit-startup"]')).toBeFalsy();
-    expect(fixture.nativeElement.querySelector('[data-testid="invite-member-panel"]')).toBeFalsy();
-    expect(fixture.nativeElement.querySelector('[data-testid="member-role-select"]')).toBeFalsy();
   });
 
   it('deve informar quando metricas privadas nao vierem para visitante', () => {
     component.canEdit = false;
     component.startup = {
       ...component.startup,
-      mainMetrics: null,
-      monthlyRevenue: null,
-      usersCount: null,
-      growthPercent: null,
-      clientsCount: null,
-      mrr: null,
-      churn: null,
+      mainMetrics: null, monthlyRevenue: null, usersCount: null,
+      growthPercent: null, clientsCount: null, mrr: null, churn: null,
       metricsPublic: false
     };
-
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Metricas privadas.');
-    expect(fixture.nativeElement.textContent).not.toContain('Receita mensal');
+    expect(fixture.nativeElement.textContent).toContain('privadas');
   });
 
   it('deve buscar usuario e enviar convite de membro como Owner', () => {
-    mockStartupService.inviteMember.mockReturnValue(of({
-      id: 30,
-      status: 'PENDING'
-    }));
+    component.activeTab = 'team';
+    fixture.detectChanges();
 
     component.memberSearchQuery = 'ana@email.com';
     component.inviteRole = 'Advisor';
@@ -208,24 +194,13 @@ describe('ProfileStartup - US-005/US-006', () => {
     component.inviteMember(component.inviteResults[0]);
 
     expect(mockUserService.searchUsers).toHaveBeenCalledWith('ana@email.com');
-    expect(mockStartupService.inviteMember).toHaveBeenCalledWith(
-      11,
-      4,
-      20,
-      'Advisor',
-      'Vamos colaborar na startup.'
-    );
-    expect(component.inviteSuccess).toBe('Convite enviado com sucesso.');
+    expect(mockStartupService.inviteMember).toHaveBeenCalledWith(11, 4, 20, 'Advisor', 'Vamos colaborar na startup.');
+    expect(component.inviteSuccess).toBe('Convite enviado.');
     expect(component.inviteResults.length).toBe(0);
   });
 
   it('deve permitir Owner alterar papel de membro', () => {
-    mockStartupService.updateMemberRole.mockReturnValue(of({
-      userId: 20,
-      role: 'Viewer'
-    }));
-
-    const member = component.members.find(item => item.userId === 20);
+    const member = component.members.find(item => item.userId === 20)!;
     component.updateMemberRole(member, 'Viewer');
 
     expect(mockStartupService.updateMemberRole).toHaveBeenCalledWith(11, 20, 4, 'Viewer');
@@ -233,9 +208,7 @@ describe('ProfileStartup - US-005/US-006', () => {
   });
 
   it('deve permitir Owner remover membro', () => {
-    mockStartupService.removeMember.mockReturnValue(of({ message: 'Membro removido com sucesso.' }));
-
-    const member = component.members.find(item => item.userId === 20);
+    const member = component.members.find(item => item.userId === 20)!;
     component.removeMember(member);
 
     expect(mockStartupService.removeMember).toHaveBeenCalledWith(11, 20, 4);

@@ -146,7 +146,7 @@ export class FeedComponent implements OnInit {
       authorId: startupAuthor ? startupAuthor.startupId : this.currentUser?.id,
       startupId: startupAuthor ? startupAuthor.startupId : null,
       authorName: startupAuthor ? startupAuthor.name : (this.currentUser?.name ?? 'Usuario'),
-      authorType: startupAuthor ? 'Startup' : 'Founder',
+      authorType: startupAuthor ? 'Startup' : (this.currentUser?.profileTypes?.[0] || 'Usuário'),
       authorPhoto: startupAuthor ? (startupAuthor.name?.charAt(0) ?? 'S') : (this.currentUser?.photo || ''),
       type: this.isStructuredUpdate ? 'STRUCTURED_UPDATE' : 'FREE_TEXT',
       content: this.newPostContent,

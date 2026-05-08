@@ -1,15 +1,19 @@
 <div *ngIf="startup">
-  <div class="mx-auto h-48 max-w-[1024px] bg-gradient-to-r from-blue-800 to-sky-500"></div>
+  <!-- Banner -->
+  <div class="mx-auto h-40 max-w-[1024px] bg-gradient-to-r from-blue-800 to-sky-500"></div>
 
   <div class="app-page-narrow -mt-16">
+
     <!-- Header card -->
-    <section class="app-card mb-6 p-6">
+    <section class="app-card mb-4 p-6">
       <div class="flex flex-col gap-5 md:flex-row md:items-start">
+        <!-- Logo -->
         <div class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-blue-700 text-3xl font-bold text-white ring-4 ring-white">
           <img *ngIf="startup.logo && startup.logo.startsWith('http')" [src]="startup.logo" class="h-full w-full object-cover" alt="">
           <span *ngIf="!startup.logo || !startup.logo.startsWith('http')">{{ startup.name?.charAt(0) }}</span>
         </div>
 
+        <!-- Info -->
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
             <h1 class="text-2xl font-bold text-slate-900">{{ startup.name }}</h1>
@@ -17,141 +21,275 @@
           </div>
           <p class="mt-1 flex flex-wrap items-center gap-x-1 text-sm text-slate-500">
             {{ startup.sector || 'Setor não informado' }} · {{ startup.stage || 'Estágio não informado' }}
-            <span *ngIf="startup.location" class="flex items-center gap-0.5">
-              · <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            <span *ngIf="startup.location">
+              · <svg class="inline h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
               {{ startup.location }}
             </span>
+            <span *ngIf="startup.foundingYear"> · Fundada em {{ startup.foundingYear }}</span>
           </p>
-          <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-700">{{ startup.shortDescription || startup.description }}</p>
-          <div class="mt-4 flex flex-wrap gap-5 text-sm text-slate-600">
+          <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-700">{{ startup.pitch || startup.shortDescription }}</p>
+          <div class="mt-3 flex flex-wrap gap-4 text-sm text-slate-600">
             <span><strong class="text-slate-900">{{ followCount }}</strong> seguidores</span>
-            <!-- Score US-036 -->
             <span class="flex items-center gap-1">
-              <strong class="text-slate-900">★ {{ startupScore }}</strong>
+              <strong class="text-blue-700">★ {{ startupScore }}</strong>
               <span class="text-xs text-slate-400">Score</span>
             </span>
+            <span *ngIf="startup.websiteUrl">
+              <a [href]="startup.websiteUrl" target="_blank" class="text-blue-600 hover:underline text-xs">{{ startup.websiteUrl }}</a>
+            </span>
           </div>
-          <p class="mt-2 text-xs text-slate-400" *ngIf="startup.updatedAt">Última atualização: {{ startup.updatedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p class="mt-1.5 text-xs text-slate-400" *ngIf="startup.updatedAt">Atualizado {{ startup.updatedAt | date:'dd/MM/yyyy' }}</p>
         </div>
 
+        <!-- Ações -->
         <div class="flex flex-col gap-2">
-          <button (click)="toggleFollow()"
-            class="app-button-primary flex items-center gap-1.5"
+          <button (click)="toggleFollow()" class="app-button-primary flex items-center gap-1.5"
             [ngClass]="isFollowing ? 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200' : ''">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path *ngIf="!isFollowing" stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/>
-              <path *ngIf="isFollowing" stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
             {{ isFollowing ? 'Seguindo' : 'Seguir' }}
           </button>
-          <button (click)="toggleSave()"
-            class="app-button-secondary flex items-center gap-1.5"
+          <button (click)="toggleSave()" class="app-button-secondary flex items-center gap-1.5"
             [ngClass]="isSaved ? 'bg-blue-50 text-blue-700 border-blue-300' : ''">
-            <svg class="h-4 w-4" [attr.fill]="isSaved ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/>
-            </svg>
             {{ isSaved ? 'Salvo' : 'Salvar' }}
           </button>
-          <button *ngIf="canEdit" type="button" (click)="startEditing()" class="app-button-secondary text-sm">Editar</button>
+          <button *ngIf="canEdit" data-testid="edit-startup" type="button" (click)="startEdit('identity')" class="app-button-secondary text-sm">Editar</button>
         </div>
       </div>
 
-      <!-- Metrics bar US-009 -->
-      <div *ngIf="startup.metricsPublic !== false || canEdit" class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <!-- Métricas rápidas -->
+      <div *ngIf="startup.metricsPublic !== false || canEdit" class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-          <p class="text-xs font-medium text-slate-500">Receita mensal</p>
-          <p class="mt-1.5 text-lg font-bold text-slate-900">{{ startup.monthlyRevenue || startup.mrr || '—' }}</p>
+          <p class="text-xs font-medium text-slate-500">MRR</p>
+          <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.mrr || startup.monthlyRevenue || '—' }}</p>
         </div>
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
           <p class="text-xs font-medium text-slate-500">Usuários</p>
-          <p class="mt-1.5 text-lg font-bold text-slate-900">{{ startup.usersCount ?? '—' }}</p>
+          <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.usersCount != null ? startup.usersCount.toLocaleString('pt-BR') : '—' }}</p>
         </div>
         <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
           <p class="text-xs font-medium text-slate-500">Crescimento</p>
-          <p class="mt-1.5 text-lg font-bold text-emerald-600">{{ startup.growthPercent || '—' }}</p>
+          <p class="mt-1 text-lg font-bold text-emerald-600">{{ startup.growthPercent || '—' }}</p>
         </div>
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
           <p class="text-xs font-medium text-slate-500">Clientes</p>
-          <p class="mt-1.5 text-lg font-bold text-slate-900">{{ startup.clientsCount ?? '—' }}</p>
+          <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.clientsCount != null ? startup.clientsCount : '—' }}</p>
         </div>
       </div>
-
       <div *ngIf="startup.metricsPublic === false && !canEdit" class="mt-4 rounded-lg bg-slate-100 p-3 text-sm text-slate-500">
-        🔒 Métricas privadas — visíveis apenas para membros da startup.
+        🔒 Métricas privadas — visíveis apenas para membros.
       </div>
     </section>
 
-    <!-- Success message -->
+    <!-- Barra de prontidão (só para founders) -->
+    <div *ngIf="canEdit" class="app-card mb-4 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-semibold text-slate-700">Completude do perfil</p>
+        <span class="text-sm font-bold" [ngClass]="readinessScore >= 80 ? 'text-emerald-600' : readinessScore >= 50 ? 'text-amber-600' : 'text-red-500'">
+          {{ readinessScore }}%
+        </span>
+      </div>
+      <div class="h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+        <div class="h-full rounded-full transition-all duration-500"
+          [style.width.%]="readinessScore"
+          [ngClass]="readinessScore >= 80 ? 'bg-emerald-500' : readinessScore >= 50 ? 'bg-amber-400' : 'bg-red-500'">
+        </div>
+      </div>
+
+      <div *ngIf="readinessItems.length > 0; else profileComplete" class="mt-3">
+        <p class="mb-2 text-xs font-medium text-slate-500">
+          {{ readinessItems.length }} {{ readinessItems.length === 1 ? 'item pendente' : 'itens pendentes' }} — clique para preencher:
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <button *ngFor="let item of readinessItems"
+            (click)="item.editSection ? startEdit(item.editSection) : setTab(item.tab!)"
+            [title]="item.detail"
+            class="group flex items-center gap-1.5 rounded-lg border border-dashed border-slate-200 bg-white px-2.5 py-1.5 text-xs transition-colors hover:border-blue-300 hover:bg-blue-50">
+            <span class="shrink-0 text-slate-400 group-hover:text-blue-400">
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+            </span>
+            <span class="flex flex-col leading-tight">
+              <span class="font-medium text-slate-700 group-hover:text-blue-700">{{ item.label }}</span>
+              <span class="text-slate-400 group-hover:text-blue-400">{{ item.section }}</span>
+            </span>
+          </button>
+        </div>
+      </div>
+      <ng-template #profileComplete>
+        <p *ngIf="readinessScore === 100" class="mt-2 text-xs text-emerald-600 font-medium">Perfil 100% completo!</p>
+      </ng-template>
+    </div>
+
+    <!-- Mensagens -->
     <div *ngIf="successMessage" class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</div>
 
-    <!-- Edit form US-007 -->
-    <form *ngIf="editing" (ngSubmit)="saveStartup()" class="app-card mb-6 p-6">
-      <h2 class="mb-5 font-bold text-slate-900">Editar startup</h2>
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <!-- FORMULÁRIO DE EDIÇÃO -->
+    <div *ngIf="editing" class="app-card mb-4 p-6">
+      <div class="mb-5 flex items-center justify-between">
+        <h2 class="font-bold text-slate-900">Editar startup</h2>
+        <div class="flex gap-2">
+          <button type="button" (click)="editSection = 'identity'" class="app-tab text-xs" [ngClass]="editSection === 'identity' ? 'app-tab-active' : ''">Identidade</button>
+          <button type="button" (click)="editSection = 'market'" class="app-tab text-xs" [ngClass]="editSection === 'market' ? 'app-tab-active' : ''">Mercado</button>
+          <button type="button" (click)="editSection = 'financial'" class="app-tab text-xs" [ngClass]="editSection === 'financial' ? 'app-tab-active' : ''">Financeiro</button>
+          <button type="button" (click)="editSection = 'round'" class="app-tab text-xs" [ngClass]="editSection === 'round' ? 'app-tab-active' : ''">Rodada</button>
+          <button type="button" (click)="editSection = 'niches'" class="app-tab text-xs" [ngClass]="editSection === 'niches' ? 'app-tab-active' : ''">Nichos</button>
+        </div>
+      </div>
+
+      <!-- Identidade -->
+      <div *ngIf="editSection === 'identity'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label class="block"><span class="label">Nome *</span><input name="name" [(ngModel)]="startupForm.name" class="app-input mt-1 w-full bg-white"></label>
         <label class="block"><span class="label">Logo (URL)</span><input name="logo" [(ngModel)]="startupForm.logo" class="app-input mt-1 w-full bg-white" placeholder="https://..."></label>
-        <label class="block md:col-span-2"><span class="label">Bio <span class="text-slate-400 font-normal text-xs">(tagline curto)</span></span><input name="shortDescription" [(ngModel)]="startupForm.shortDescription" class="app-input mt-1 w-full bg-white" placeholder="Ex: Plataforma de crédito para pequenas empresas"></label>
-        <label class="block md:col-span-2"><span class="label">Descrição</span><textarea name="description" [(ngModel)]="startupForm.description" rows="4" class="app-input mt-1 w-full bg-white" placeholder="Descreva com mais detalhes sua startup, modelo de negócio e diferenciais..."></textarea></label>
+        <label class="block md:col-span-2"><span class="label">Pitch <span class="text-xs text-slate-400 font-normal">(tagline curto)</span></span><input name="pitch" [(ngModel)]="startupForm.pitch" class="app-input mt-1 w-full bg-white" placeholder="Ex: Plataforma de crédito para PMEs com IA preditiva"></label>
+        <label class="block md:col-span-2"><span class="label">Problema</span><textarea name="problemDescription" [(ngModel)]="startupForm.problemDescription" rows="3" class="app-input mt-1 w-full bg-white" placeholder="Qual problema você resolve? Qual o tamanho do problema?"></textarea></label>
+        <label class="block md:col-span-2"><span class="label">Solução</span><textarea name="solutionDescription" [(ngModel)]="startupForm.solutionDescription" rows="3" class="app-input mt-1 w-full bg-white" placeholder="Como você resolve o problema? O que faz a plataforma?"></textarea></label>
+        <label class="block md:col-span-2"><span class="label">Diferencial competitivo</span><textarea name="competitiveDifferential" [(ngModel)]="startupForm.competitiveDifferential" rows="2" class="app-input mt-1 w-full bg-white" placeholder="Por que você é difícil de copiar? Qual a barreira de entrada?"></textarea></label>
+        <label class="block md:col-span-2"><span class="label">Descrição completa</span><textarea name="description" [(ngModel)]="startupForm.description" rows="4" class="app-input mt-1 w-full bg-white"></textarea></label>
         <label class="block"><span class="label">Setor</span><input name="sector" [(ngModel)]="startupForm.sector" class="app-input mt-1 w-full bg-white"></label>
         <label class="block">
           <span class="label">Estágio</span>
           <select name="stage" [(ngModel)]="startupForm.stage" class="app-input mt-1 w-full bg-white">
             <option value="">Selecionar</option>
-            <option value="Ideia">Ideia</option>
-            <option value="MVP">MVP</option>
-            <option value="Primeiros usuários">Primeiros usuários</option>
-            <option value="Receita inicial">Receita inicial</option>
-            <option value="Tração">Tração</option>
-            <option value="Escala">Escala</option>
+            <option *ngFor="let s of ['Ideia','MVP','Primeiros usuários','Receita inicial','Tração','Escala']" [value]="s">{{ s }}</option>
           </select>
         </label>
         <label class="block"><span class="label">Localização</span><input name="location" [(ngModel)]="startupForm.location" class="app-input mt-1 w-full bg-white"></label>
+        <label class="block"><span class="label">Ano de fundação</span><input type="number" name="foundingYear" [(ngModel)]="startupForm.foundingYear" class="app-input mt-1 w-full bg-white" placeholder="Ex: 2021"></label>
         <label class="block"><span class="label">Site</span><input name="websiteUrl" [(ngModel)]="startupForm.websiteUrl" class="app-input mt-1 w-full bg-white" placeholder="https://..."></label>
-        <label class="block md:col-span-2"><span class="label">Objetivo atual</span><input name="currentObjective" [(ngModel)]="startupForm.currentObjective" class="app-input mt-1 w-full bg-white"></label>
+        <label class="block"><span class="label">Pitch Deck (URL)</span><input name="pitchDeckUrl" [(ngModel)]="startupForm.pitchDeckUrl" class="app-input mt-1 w-full bg-white" placeholder="https://drive.google.com/..."></label>
+        <label class="block md:col-span-2"><span class="label">Objetivo atual</span><input name="currentObjective" [(ngModel)]="startupForm.currentObjective" class="app-input mt-1 w-full bg-white" placeholder="Ex: Captar R$ 1.5M Seed até dezembro"></label>
+      </div>
 
-        <h3 class="md:col-span-2 pt-2 font-semibold text-slate-800 border-t border-slate-200">Métricas</h3>
-        <label class="block"><span class="label">Receita mensal</span><input name="monthlyRevenue" [(ngModel)]="startupForm.monthlyRevenue" class="app-input mt-1 w-full bg-white"></label>
-        <label class="block"><span class="label">MRR</span><input name="mrr" [(ngModel)]="startupForm.mrr" class="app-input mt-1 w-full bg-white"></label>
-        <label class="block"><span class="label">Usuários</span><input name="usersCount" type="number" [(ngModel)]="startupForm.usersCount" class="app-input mt-1 w-full bg-white"></label>
-        <label class="block"><span class="label">Clientes</span><input name="clientsCount" type="number" [(ngModel)]="startupForm.clientsCount" class="app-input mt-1 w-full bg-white"></label>
-        <label class="block"><span class="label">Crescimento</span><input name="growthPercent" [(ngModel)]="startupForm.growthPercent" class="app-input mt-1 w-full bg-white" placeholder="Ex: +32%"></label>
-        <label class="block"><span class="label">Churn</span><input name="churn" [(ngModel)]="startupForm.churn" class="app-input mt-1 w-full bg-white"></label>
-        <label class="inline-flex items-center gap-3 md:col-span-2 mt-1">
-          <input name="metricsPublic" type="checkbox" [(ngModel)]="startupForm.metricsPublic" class="h-4 w-4 rounded border-slate-300 text-blue-700">
-          <span class="text-sm font-semibold text-slate-700">Exibir métricas publicamente</span>
+      <!-- Mercado -->
+      <div *ngIf="editSection === 'market'" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <label class="block"><span class="label">TAM <span class="text-xs text-slate-400 font-normal">(Mercado total)</span></span><input name="tam" [(ngModel)]="startupForm.tam" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 18B"></label>
+        <label class="block"><span class="label">SAM <span class="text-xs text-slate-400 font-normal">(Mercado endereçável)</span></span><input name="sam" [(ngModel)]="startupForm.sam" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 3.2B"></label>
+        <label class="block"><span class="label">SOM <span class="text-xs text-slate-400 font-normal">(Mercado capturável)</span></span><input name="som" [(ngModel)]="startupForm.som" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 320M"></label>
+        <label class="block md:col-span-3"><span class="label">Fonte dos dados</span><input name="marketSource" [(ngModel)]="startupForm.marketSource" class="app-input mt-1 w-full bg-white" placeholder="Ex: IBGE + Relatório Fintechlab 2024"></label>
+        <label class="block md:col-span-3"><span class="label">Timing de mercado</span><textarea name="marketTiming" [(ngModel)]="startupForm.marketTiming" rows="3" class="app-input mt-1 w-full bg-white" placeholder="Por que agora? Quais tendências favorecem esse mercado?"></textarea></label>
+      </div>
+
+      <!-- Financeiro -->
+      <div *ngIf="editSection === 'financial'" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <label class="block"><span class="label">MRR</span><input name="mrr" [(ngModel)]="startupForm.mrr" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 180k"></label>
+        <label class="block"><span class="label">ARR</span><input name="arr" [(ngModel)]="startupForm.arr" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 2.16M"></label>
+        <label class="block"><span class="label">Receita mensal</span><input name="monthlyRevenue" [(ngModel)]="startupForm.monthlyRevenue" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 180k"></label>
+        <label class="block"><span class="label">Receita anual</span><input name="annualRevenue" [(ngModel)]="startupForm.annualRevenue" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 1.8M"></label>
+        <label class="block"><span class="label">CAC</span><input name="cac" [(ngModel)]="startupForm.cac" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 4.200"></label>
+        <label class="block"><span class="label">LTV</span><input name="ltv" [(ngModel)]="startupForm.ltv" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 38.000"></label>
+        <label class="block"><span class="label">Margem bruta</span><input name="grossMargin" [(ngModel)]="startupForm.grossMargin" class="app-input mt-1 w-full bg-white" placeholder="Ex: 72%"></label>
+        <label class="block"><span class="label">Burn rate</span><input name="burnRate" [(ngModel)]="startupForm.burnRate" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 95k/mês"></label>
+        <label class="block"><span class="label">Runway</span><input name="runway" [(ngModel)]="startupForm.runway" class="app-input mt-1 w-full bg-white" placeholder="Ex: 18 meses"></label>
+        <label class="block"><span class="label">Usuários</span><input type="number" name="usersCount" [(ngModel)]="startupForm.usersCount" class="app-input mt-1 w-full bg-white"></label>
+        <label class="block"><span class="label">Clientes pagantes</span><input type="number" name="clientsCount" [(ngModel)]="startupForm.clientsCount" class="app-input mt-1 w-full bg-white"></label>
+        <label class="block"><span class="label">Crescimento MoM</span><input name="growthPercent" [(ngModel)]="startupForm.growthPercent" class="app-input mt-1 w-full bg-white" placeholder="Ex: +32%"></label>
+        <label class="block"><span class="label">Churn</span><input name="churn" [(ngModel)]="startupForm.churn" class="app-input mt-1 w-full bg-white" placeholder="Ex: 2.1%"></label>
+        <label class="flex items-center gap-2 md:col-span-3 mt-1">
+          <input type="checkbox" name="metricsPublic" [(ngModel)]="startupForm.metricsPublic" class="h-4 w-4 rounded border-slate-300 text-blue-700">
+          <span class="text-sm text-slate-700 font-medium">Exibir métricas publicamente</span>
         </label>
       </div>
+
+      <!-- Rodada -->
+      <div *ngIf="editSection === 'round'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label class="block">
+          <span class="label">Status da rodada</span>
+          <select name="roundStatus" [(ngModel)]="startupForm.roundStatus" class="app-input mt-1 w-full bg-white">
+            <option value="">Não informado</option>
+            <option *ngFor="let s of ['Não captando','Buscando','Aberta','Fechada','Comprometida']" [value]="s">{{ s }}</option>
+          </select>
+        </label>
+        <label class="block"><span class="label">Valuation pre-money</span><input name="roundValuation" [(ngModel)]="startupForm.roundValuation" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 9M"></label>
+        <label class="block"><span class="label">Valor captado</span><input name="roundAmountRaised" [(ngModel)]="startupForm.roundAmountRaised" class="app-input mt-1 w-full bg-white" placeholder="Ex: R$ 180k captados"></label>
+        <label class="block"><span class="label">Estrutura</span><input name="roundStructure" [(ngModel)]="startupForm.roundStructure" class="app-input mt-1 w-full bg-white" placeholder="Ex: SAFE + equity, CRI, debênture"></label>
+        <label class="block"><span class="label">% comprometido</span><input name="roundPercentCommitted" [(ngModel)]="startupForm.roundPercentCommitted" class="app-input mt-1 w-full bg-white" placeholder="Ex: 12%"></label>
+        <label class="block md:col-span-2"><span class="label">Uso do capital</span><textarea name="roundCapitalUse" [(ngModel)]="startupForm.roundCapitalUse" rows="2" class="app-input mt-1 w-full bg-white" placeholder="Ex: 60% produto, 30% go-to-market, 10% operações"></textarea></label>
+      </div>
+
+      <!-- Nichos -->
+      <div *ngIf="editSection === 'niches'">
+        <p class="mb-3 text-sm text-slate-600">Selecione os nichos que melhor descrevem sua startup. Os campos específicos aparecerão nas abas correspondentes.</p>
+        <div class="flex flex-wrap gap-2">
+          <button *ngFor="let n of availableNiches" type="button"
+            (click)="toggleNiche(n.key)"
+            class="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors"
+            [ngClass]="isNicheSelected(n.key) ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-600 border-slate-300 hover:border-blue-400'">
+            {{ n.label }}
+          </button>
+        </div>
+      </div>
+
       <div *ngIf="errorMessage" class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</div>
       <div class="mt-5 flex gap-3">
-        <button type="submit" [disabled]="loading" class="app-button-primary">{{ loading ? 'Salvando...' : 'Salvar' }}</button>
-        <button type="button" (click)="cancelEditing()" class="app-button-secondary">Cancelar</button>
+        <button type="button" (click)="saveStartup()" [disabled]="loading" class="app-button-primary">{{ loading ? 'Salvando...' : 'Salvar' }}</button>
+        <button type="button" (click)="cancelEdit()" class="app-button-secondary">Cancelar</button>
       </div>
-    </form>
-
-    <!-- Tabs -->
-    <div class="app-tabbar mb-6">
-      <button (click)="activeTab = 'about'" class="app-tab" [ngClass]="activeTab === 'about' ? 'app-tab-active' : ''">Sobre</button>
-      <button (click)="activeTab = 'members'" class="app-tab" [ngClass]="activeTab === 'members' ? 'app-tab-active' : ''">Equipe ({{ members.length }})</button>
-      <button *ngIf="canEdit" (click)="activeTab = 'analytics'" class="app-tab" [ngClass]="activeTab === 'analytics' ? 'app-tab-active' : ''">Analytics</button>
     </div>
 
-    <!-- About tab -->
-    <div *ngIf="activeTab === 'about'" class="space-y-4">
-      <!-- Posts / updates -->
-      <section *ngFor="let post of recentPosts" class="app-card p-5">
-        <div class="mb-3 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">
-              {{ startup.name?.charAt(0) }}
-            </div>
-            <div>
-              <h3 class="font-semibold text-slate-900">{{ post.authorName }}</h3>
-              <p class="text-xs text-slate-500">{{ post.authorType }}</p>
-            </div>
+    <!-- TABS DE NAVEGAÇÃO -->
+    <div class="mb-4 overflow-x-auto">
+      <div class="app-tabbar min-w-max">
+        <button (click)="setTab('overview')" class="app-tab" [ngClass]="activeTab === 'overview' ? 'app-tab-active' : ''">Visão Geral</button>
+        <button (click)="setTab('market')" class="app-tab" [ngClass]="activeTab === 'market' ? 'app-tab-active' : ''">Mercado</button>
+        <button (click)="setTab('financial')" class="app-tab" [ngClass]="activeTab === 'financial' ? 'app-tab-active' : ''">Financeiro</button>
+        <button (click)="setTab('team')" class="app-tab" [ngClass]="activeTab === 'team' ? 'app-tab-active' : ''">Equipe ({{ members.length }})</button>
+        <button (click)="setTab('captable')" class="app-tab" [ngClass]="activeTab === 'captable' ? 'app-tab-active' : ''">Cap Table</button>
+        <button (click)="setTab('round')" class="app-tab" [ngClass]="activeTab === 'round' ? 'app-tab-active' : ''">Rodada</button>
+        <button (click)="setTab('risks')" class="app-tab" [ngClass]="activeTab === 'risks' ? 'app-tab-active' : ''">Riscos</button>
+        <button *ngFor="let nk of nicheTabKeys" (click)="setTab(nk)" class="app-tab" [ngClass]="activeTab === nk ? 'app-tab-active' : ''">{{ nicheLabel(nk) }}</button>
+        <button *ngIf="canEdit" (click)="setTab('analytics')" class="app-tab" [ngClass]="activeTab === 'analytics' ? 'app-tab-active' : ''">Analytics</button>
+      </div>
+    </div>
+
+    <!-- ====== VISÃO GERAL ====== -->
+    <div *ngIf="activeTab === 'overview'" class="space-y-4">
+      <!-- Problema/Solução/Diferencial -->
+      <section class="app-card p-5" *ngIf="startup.problemDescription || startup.solutionDescription || startup.competitiveDifferential">
+        <h2 class="mb-4 font-bold text-slate-900">Sobre a startup</h2>
+        <div class="grid gap-4 md:grid-cols-3">
+          <div *ngIf="startup.problemDescription" class="rounded-lg border border-slate-200 p-4">
+            <p class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">Problema</p>
+            <p class="text-sm leading-relaxed text-slate-700">{{ startup.problemDescription }}</p>
           </div>
-          <span *ngIf="post.badge" class="app-chip-blue text-xs">⌁ {{ post.badge }}</span>
+          <div *ngIf="startup.solutionDescription" class="rounded-lg border border-blue-100 bg-blue-50 p-4">
+            <p class="mb-2 text-xs font-bold uppercase tracking-wide text-blue-500">Solução</p>
+            <p class="text-sm leading-relaxed text-slate-700">{{ startup.solutionDescription }}</p>
+          </div>
+          <div *ngIf="startup.competitiveDifferential" class="rounded-lg border border-amber-100 bg-amber-50 p-4">
+            <p class="mb-2 text-xs font-bold uppercase tracking-wide text-amber-500">Diferencial</p>
+            <p class="text-sm leading-relaxed text-slate-700">{{ startup.competitiveDifferential }}</p>
+          </div>
         </div>
-        <div *ngIf="post.metrics?.length > 0" class="mb-4 grid grid-cols-2 gap-2">
+      </section>
+
+      <!-- Objetivo -->
+      <section *ngIf="startup.currentObjective" class="app-card p-5">
+        <h2 class="mb-2 font-bold text-slate-900">Objetivo atual</h2>
+        <p class="text-sm text-slate-700">{{ startup.currentObjective }}</p>
+      </section>
+
+      <!-- Pitch Deck -->
+      <section *ngIf="startup.pitchDeckUrl" class="app-card p-5 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-slate-900">Pitch Deck</h2>
+          <p class="text-sm text-slate-500">Acesse o material de apresentação</p>
+        </div>
+        <a [href]="startup.pitchDeckUrl" target="_blank" class="app-button-secondary text-sm">Ver deck</a>
+      </section>
+
+      <!-- Posts recentes -->
+      <section *ngFor="let post of recentPosts" class="app-card p-5">
+        <div class="mb-3 flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700 text-sm font-bold text-white">
+            {{ startup.name?.charAt(0) }}
+          </div>
+          <div>
+            <p class="font-semibold text-slate-900">{{ post.authorName }}</p>
+            <p class="text-xs text-slate-500">{{ post.authorType }}</p>
+          </div>
+          <span *ngIf="post.badge" class="ml-auto app-chip-blue text-xs">⌁ {{ post.badge }}</span>
+        </div>
+        <div *ngIf="post.metrics?.length > 0" class="mb-3 grid grid-cols-2 gap-2">
           <div *ngFor="let m of post.metrics" class="rounded-lg border border-blue-100 bg-sky-50 p-3">
             <p class="text-xs font-bold uppercase text-blue-600">{{ m.name }}</p>
             <div class="flex items-baseline gap-2 mt-1">
@@ -161,47 +299,123 @@
           </div>
         </div>
         <p class="text-sm leading-relaxed text-slate-800">{{ post.content }}</p>
-        <div class="mt-4 flex gap-6 border-t border-slate-100 pt-3 text-sm text-slate-500">
-          <span class="flex items-center gap-1">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
-            {{ post.likesCount }}
-          </span>
-          <span class="flex items-center gap-1">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"/></svg>
-            {{ post.commentsCount }}
-          </span>
-        </div>
       </section>
 
-      <!-- Description -->
+      <!-- Descrição completa -->
       <section *ngIf="startup.description" class="app-card p-5">
-        <h2 class="mb-3 font-bold text-slate-900">Sobre a startup</h2>
+        <h2 class="mb-3 font-bold text-slate-900">Descrição</h2>
         <p class="text-sm leading-relaxed text-slate-700 whitespace-pre-line">{{ startup.description }}</p>
-      </section>
-
-      <!-- Objective -->
-      <section *ngIf="startup.currentObjective" class="app-card p-5">
-        <h2 class="mb-2 flex items-center gap-2 font-bold text-slate-900">
-          <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
-          Objetivo atual
-        </h2>
-        <p class="text-sm text-slate-700">{{ startup.currentObjective }}</p>
-      </section>
-
-      <!-- Website -->
-      <section *ngIf="startup.websiteUrl" class="app-card p-5">
-        <h2 class="mb-2 font-bold text-slate-900">Site</h2>
-        <a [href]="startup.websiteUrl" target="_blank" class="text-sm text-blue-700 hover:underline">{{ startup.websiteUrl }}</a>
       </section>
     </div>
 
-    <!-- Members tab US-010/011 -->
-    <div *ngIf="activeTab === 'members'" class="space-y-4">
+    <!-- ====== MERCADO ====== -->
+    <div *ngIf="activeTab === 'market'" class="space-y-4">
+      <section class="app-card p-5">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="font-bold text-slate-900">Tamanho de mercado</h2>
+          <button *ngIf="canEdit" (click)="startEdit('market')" class="app-button-secondary text-xs">Editar</button>
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div class="rounded-xl border border-slate-200 p-4 text-center">
+            <p class="text-xs font-bold uppercase tracking-wide text-slate-400 mb-1">TAM</p>
+            <p class="text-2xl font-bold text-slate-900">{{ startup.tam || '—' }}</p>
+            <p class="text-xs text-slate-400 mt-1">Mercado total</p>
+          </div>
+          <div class="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
+            <p class="text-xs font-bold uppercase tracking-wide text-blue-400 mb-1">SAM</p>
+            <p class="text-2xl font-bold text-blue-700">{{ startup.sam || '—' }}</p>
+            <p class="text-xs text-slate-400 mt-1">Mercado endereçável</p>
+          </div>
+          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+            <p class="text-xs font-bold uppercase tracking-wide text-emerald-500 mb-1">SOM</p>
+            <p class="text-2xl font-bold text-emerald-700">{{ startup.som || '—' }}</p>
+            <p class="text-xs text-slate-400 mt-1">Mercado capturável</p>
+          </div>
+        </div>
+        <p *ngIf="startup.marketSource" class="mt-3 text-xs text-slate-400">Fonte: {{ startup.marketSource }}</p>
+      </section>
+      <section *ngIf="startup.marketTiming" class="app-card p-5">
+        <h2 class="mb-2 font-bold text-slate-900">Timing de mercado</h2>
+        <p class="text-sm leading-relaxed text-slate-700">{{ startup.marketTiming }}</p>
+      </section>
+    </div>
+
+    <!-- ====== FINANCEIRO ====== -->
+    <div *ngIf="activeTab === 'financial'">
+      <div *ngIf="startup.metricsPublic === false && !canEdit" class="app-card p-5 text-sm text-slate-500 mb-4">
+        🔒 Métricas financeiras privadas.
+      </div>
+      <div *ngIf="startup.metricsPublic !== false || canEdit" class="space-y-4">
+        <section class="app-card p-5">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="font-bold text-slate-900">Métricas financeiras</h2>
+            <button *ngIf="canEdit" (click)="startEdit('financial')" class="app-button-secondary text-xs">Editar</button>
+          </div>
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            <div *ngIf="startup.mrr || startup.monthlyRevenue" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">MRR</p>
+              <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.mrr || startup.monthlyRevenue }}</p>
+            </div>
+            <div *ngIf="startup.arr" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">ARR</p>
+              <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.arr }}</p>
+            </div>
+            <div *ngIf="startup.annualRevenue" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">Receita anual</p>
+              <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.annualRevenue }}</p>
+            </div>
+            <div *ngIf="startup.growthPercent" class="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+              <p class="text-xs text-slate-500">Crescimento MoM</p>
+              <p class="mt-1 text-lg font-bold text-emerald-600">{{ startup.growthPercent }}</p>
+            </div>
+            <div *ngIf="startup.grossMargin" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">Margem bruta</p>
+              <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.grossMargin }}</p>
+            </div>
+            <div *ngIf="startup.cac" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">CAC</p>
+              <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.cac }}</p>
+            </div>
+            <div *ngIf="startup.ltv" class="rounded-lg border border-blue-100 bg-blue-50 p-3">
+              <p class="text-xs text-slate-500">LTV</p>
+              <p class="mt-1 text-lg font-bold text-blue-700">{{ startup.ltv }}</p>
+            </div>
+            <div *ngIf="startup.cac && startup.ltv" class="rounded-lg border border-purple-100 bg-purple-50 p-3">
+              <p class="text-xs text-slate-500">LTV/CAC</p>
+              <p class="mt-1 text-lg font-bold text-purple-700">calculado</p>
+            </div>
+            <div *ngIf="startup.churn" class="rounded-lg border border-red-100 bg-red-50 p-3">
+              <p class="text-xs text-slate-500">Churn</p>
+              <p class="mt-1 text-lg font-bold text-red-600">{{ startup.churn }}</p>
+            </div>
+            <div *ngIf="startup.usersCount != null" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">Usuários</p>
+              <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.usersCount.toLocaleString('pt-BR') }}</p>
+            </div>
+            <div *ngIf="startup.clientsCount != null" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">Clientes pagantes</p>
+              <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.clientsCount }}</p>
+            </div>
+            <div *ngIf="startup.burnRate" class="rounded-lg border border-amber-100 bg-amber-50 p-3">
+              <p class="text-xs text-slate-500">Burn rate</p>
+              <p class="mt-1 text-lg font-bold text-amber-700">{{ startup.burnRate }}</p>
+            </div>
+            <div *ngIf="startup.runway" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">Runway</p>
+              <p class="mt-1 text-lg font-bold text-slate-900">{{ startup.runway }}</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ====== EQUIPE ====== -->
+    <div *ngIf="activeTab === 'team'" class="space-y-4">
       <section class="app-card p-5">
         <h2 class="mb-4 font-bold text-slate-900">Equipe</h2>
         <div class="space-y-3">
           <div *ngFor="let member of members" class="flex items-center gap-4 border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
-            <a [routerLink]="['/user', member.userId]" class="flex items-center gap-4 flex-1 min-w-0 hover:opacity-80">
+            <a [routerLink]="['/user', member.userId]" class="flex items-center gap-3 flex-1 min-w-0 hover:opacity-80">
               <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-sm font-bold text-slate-700">
                 <img *ngIf="member.photo && member.photo.startsWith('http')" [src]="member.photo" class="h-full w-full object-cover" alt="">
                 <span *ngIf="!member.photo || !member.photo.startsWith('http')">{{ member.name?.charAt(0) }}</span>
@@ -213,21 +427,20 @@
             </a>
             <div class="flex items-center gap-2">
               <select *ngIf="canManageMembers() && member.role !== 'Owner'; else roleBadge"
+                data-testid="member-role-select"
                 [ngModel]="member.role" (ngModelChange)="updateMemberRole(member, $event)"
                 class="app-input h-8 bg-white py-1 text-xs">
                 <option *ngFor="let role of memberRoles" [value]="role">{{ role }}</option>
               </select>
               <button *ngIf="canManageMembers() && member.role !== 'Owner'"
-                type="button" (click)="removeMember(member)"
-                class="text-xs text-red-500 hover:text-red-700">Remover</button>
+                (click)="removeMember(member)" class="text-xs text-red-500 hover:text-red-700">Remover</button>
               <ng-template #roleBadge><span class="app-chip text-xs">{{ member.role }}</span></ng-template>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Invite member US-010 -->
-      <section *ngIf="canEdit" class="app-card p-5">
+      <section *ngIf="canEdit" data-testid="invite-member-panel" class="app-card p-5">
         <h2 class="mb-4 font-bold text-slate-900">Convidar membro</h2>
         <div class="space-y-3">
           <div class="flex gap-2">
@@ -244,7 +457,7 @@
           <div *ngIf="inviteSuccess" class="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{{ inviteSuccess }}</div>
           <div *ngFor="let u of inviteResults" class="flex items-center justify-between rounded-lg border border-slate-200 p-3">
             <div>
-              <p class="text-sm font-semibold text-slate-900">{{ u.name }}</p>
+              <p class="text-sm font-semibold">{{ u.name }}</p>
               <p class="text-xs text-slate-500">{{ u.email }}</p>
             </div>
             <button (click)="inviteMember(u)" [disabled]="inviteLoading" class="app-button-primary text-sm">Convidar</button>
@@ -253,7 +466,206 @@
       </section>
     </div>
 
-    <!-- Analytics tab US-042 -->
+    <!-- ====== CAP TABLE ====== -->
+    <div *ngIf="activeTab === 'captable'" class="space-y-4">
+      <section class="app-card p-5">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="font-bold text-slate-900">Cap Table</h2>
+          <button *ngIf="canEdit" (click)="openCapTableEdit()" class="app-button-secondary text-xs">Editar</button>
+        </div>
+
+        <!-- View mode -->
+        <div *ngIf="capTable.length > 0 && capTableForm.length === 0" class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-200 text-left">
+                <th class="pb-2 font-semibold text-slate-600">Nome</th>
+                <th class="pb-2 font-semibold text-slate-600">Tipo</th>
+                <th class="pb-2 font-semibold text-slate-600 text-right">%</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of capTable" class="border-b border-slate-100 last:border-b-0">
+                <td class="py-2.5 font-medium text-slate-900">{{ e.name }}</td>
+                <td class="py-2.5 text-slate-500">{{ e.type }}</td>
+                <td class="py-2.5 text-right font-bold text-slate-900">{{ e.percentage }}%</td>
+              </tr>
+              <tr class="border-t border-slate-200 bg-slate-50">
+                <td colspan="2" class="py-2 text-xs text-slate-500 font-semibold">Total</td>
+                <td class="py-2 text-right font-bold" [ngClass]="capTableViewTotal === 100 ? 'text-emerald-600' : 'text-amber-600'">
+                  {{ capTableViewTotal }}%
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p *ngIf="capTable.length === 0 && capTableForm.length === 0" class="text-sm text-slate-400">Nenhuma entrada na cap table.</p>
+
+        <!-- Edit mode -->
+        <div *ngIf="capTableForm.length > 0">
+          <div *ngFor="let e of capTableForm; let i = index" class="mb-2 flex flex-wrap items-center gap-2 sm:flex-nowrap">
+            <input [(ngModel)]="e.name" placeholder="Nome" class="app-input bg-white text-sm min-w-0 flex-1" style="min-width:100px">
+            <select [(ngModel)]="e.type" class="app-input bg-white text-sm w-32 shrink-0">
+              <option *ngFor="let t of ['Founder','Co-founder','Investidor','Advisor','ESOP','Outro']" [value]="t">{{ t }}</option>
+            </select>
+            <div class="relative w-20 shrink-0">
+              <input type="number" [(ngModel)]="e.percentage" placeholder="0" min="0" max="100"
+                class="app-input bg-white text-sm w-full pr-6 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+              <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">%</span>
+            </div>
+            <button (click)="removeCapEntry(i)" class="flex h-8 w-8 shrink-0 items-center justify-center rounded text-slate-400 hover:text-red-500">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex gap-3">
+              <button (click)="addCapEntry()" class="text-sm text-blue-700 font-semibold hover:underline">+ Adicionar</button>
+              <span class="text-sm text-slate-500">Total: <strong [ngClass]="capTableTotal === 100 ? 'text-emerald-600' : 'text-amber-600'">{{ capTableTotal | number:'1.0-1' }}%</strong></span>
+            </div>
+            <div class="flex gap-2">
+              <button (click)="saveCapTable()" [disabled]="savingCapTable" class="app-button-primary text-sm">{{ savingCapTable ? 'Salvando...' : 'Salvar' }}</button>
+              <button (click)="capTableForm = []" class="app-button-secondary text-sm">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ====== RODADA ====== -->
+    <div *ngIf="activeTab === 'round'" class="space-y-4">
+      <section class="app-card p-5">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="font-bold text-slate-900">Rodada atual</h2>
+          <button *ngIf="canEdit" (click)="startEdit('round')" class="app-button-secondary text-xs">Editar</button>
+        </div>
+        <div *ngIf="startup.roundStatus; else noRound">
+          <div class="mb-4 flex items-center gap-2">
+            <span class="rounded-full px-3 py-1 text-sm font-semibold"
+              [ngClass]="startup.roundStatus === 'Aberta' ? 'bg-emerald-100 text-emerald-700' : startup.roundStatus === 'Fechada' ? 'bg-slate-100 text-slate-600' : 'bg-blue-100 text-blue-700'">
+              {{ startup.roundStatus }}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div *ngIf="startup.roundValuation" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">Valuation pre-money</p>
+              <p class="mt-1 font-bold text-slate-900">{{ startup.roundValuation }}</p>
+            </div>
+            <div *ngIf="startup.roundAmountRaised" class="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+              <p class="text-xs text-slate-500">Captado</p>
+              <p class="mt-1 font-bold text-emerald-700">{{ startup.roundAmountRaised }}</p>
+            </div>
+            <div *ngIf="startup.roundStructure" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">Estrutura</p>
+              <p class="mt-1 font-bold text-slate-900">{{ startup.roundStructure }}</p>
+            </div>
+            <div *ngIf="startup.roundPercentCommitted" class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">% comprometido</p>
+              <p class="mt-1 font-bold text-slate-900">{{ startup.roundPercentCommitted }}</p>
+            </div>
+          </div>
+          <div *ngIf="startup.roundCapitalUse" class="mt-4 rounded-lg bg-slate-50 p-4">
+            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-slate-400">Uso do capital</p>
+            <p class="text-sm text-slate-700">{{ startup.roundCapitalUse }}</p>
+          </div>
+        </div>
+        <ng-template #noRound>
+          <p class="text-sm text-slate-400">Informações de rodada não disponíveis.</p>
+        </ng-template>
+      </section>
+    </div>
+
+    <!-- ====== RISCOS ====== -->
+    <div *ngIf="activeTab === 'risks'" class="space-y-4">
+      <section class="app-card p-5">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="font-bold text-slate-900">Riscos e mitigações</h2>
+          <button *ngIf="canEdit" (click)="openRisksEdit()" class="app-button-secondary text-xs">Editar</button>
+        </div>
+
+        <!-- View mode -->
+        <div *ngIf="risks.length > 0 && risksForm.length === 0" class="space-y-3">
+          <div *ngFor="let r of risks" class="rounded-lg border p-4" [ngClass]="riskColor(r.level)">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="mb-0.5 text-xs font-bold uppercase tracking-wide text-slate-400">Risco</p>
+                <p class="font-semibold text-slate-900">{{ r.title }}</p>
+              </div>
+              <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" [ngClass]="riskColor(r.level)">
+                {{ riskLabel(r.level) }}
+              </span>
+            </div>
+            <div *ngIf="r.mitigation" class="mt-3">
+              <p class="mb-0.5 text-xs font-bold uppercase tracking-wide text-slate-400">Mitigação</p>
+              <p class="text-sm text-slate-600">{{ r.mitigation }}</p>
+            </div>
+          </div>
+        </div>
+        <p *ngIf="risks.length === 0 && risksForm.length === 0" class="text-sm text-slate-400">Nenhum risco cadastrado.</p>
+
+        <!-- Edit mode -->
+        <div *ngIf="risksForm.length > 0" class="space-y-3">
+          <div *ngFor="let r of risksForm; let i = index" class="rounded-lg border border-slate-200 p-4">
+            <div class="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+              <input [(ngModel)]="r.title" placeholder="Título do risco" class="app-input bg-white text-sm min-w-0 flex-1" style="min-width:120px">
+              <select [(ngModel)]="r.level" class="app-input bg-white text-sm w-28 shrink-0">
+                <option value="baixo">Baixo</option>
+                <option value="medio">Médio</option>
+                <option value="alto">Alto</option>
+              </select>
+              <button (click)="removeRisk(i)" class="flex h-9 w-9 shrink-0 items-center justify-center rounded text-slate-400 hover:text-red-500">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <textarea [(ngModel)]="r.mitigation" rows="2" placeholder="Como você mitiga este risco?" class="app-input mt-2 w-full bg-white text-sm"></textarea>
+          </div>
+          <div class="flex items-center justify-between mt-2">
+            <button (click)="addRisk()" class="text-sm text-blue-700 font-semibold hover:underline">+ Adicionar risco</button>
+            <div class="flex gap-2">
+              <button (click)="saveRisks()" [disabled]="savingRisks" class="app-button-primary text-sm">{{ savingRisks ? 'Salvando...' : 'Salvar' }}</button>
+              <button (click)="risksForm = []" class="app-button-secondary text-sm">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ====== TABS DE NICHO ====== -->
+    <ng-container *ngFor="let nk of nicheTabKeys">
+      <div *ngIf="activeTab === nk" class="space-y-4">
+        <section class="app-card p-5">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="font-bold text-slate-900">{{ nicheLabel(nk) }} — Métricas específicas</h2>
+          </div>
+
+          <!-- Investidor: apenas visualização -->
+          <div *ngIf="!canEdit" class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div *ngFor="let f of getNicheFieldsConfig(nk)"
+              class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p class="text-xs text-slate-500">{{ f.label }}</p>
+              <p class="mt-1 font-bold text-slate-900">{{ nicheDataMap[nk]?.[f.key] || '—' }}</p>
+            </div>
+          </div>
+
+          <!-- Founder: campos editáveis -->
+          <div *ngIf="canEdit">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-4">
+              <ng-container *ngFor="let f of getNicheFieldsConfig(nk)">
+                <label class="block">
+                  <span class="label">{{ f.label }}</span>
+                  <input *ngIf="nicheFormsMap[nk]"
+                    [(ngModel)]="nicheFormsMap[nk][f.key]"
+                    [placeholder]="f.placeholder || ''"
+                    class="app-input mt-1 w-full bg-white text-sm">
+                </label>
+              </ng-container>
+            </div>
+            <button (click)="saveNicheData(nk)" class="app-button-primary text-sm">Salvar dados {{ nicheLabel(nk) }}</button>
+          </div>
+        </section>
+      </div>
+    </ng-container>
+
+    <!-- ====== ANALYTICS ====== -->
     <div *ngIf="activeTab === 'analytics' && canEdit">
       <div class="grid grid-cols-2 gap-4 md:grid-cols-4 mb-6">
         <div class="app-card p-4 text-center">
@@ -273,60 +685,34 @@
           <p class="text-xs text-slate-500 mt-1">Score</p>
         </div>
       </div>
-
       <div class="app-card p-5">
         <h2 class="mb-4 font-bold text-slate-900">Posts recentes</h2>
-        <div *ngIf="recentPosts.length === 0" class="text-sm text-slate-400">Nenhum post publicado ainda.</div>
+        <div *ngIf="recentPosts.length === 0" class="text-sm text-slate-400">Nenhum post publicado.</div>
         <div *ngFor="let post of recentPosts" class="border-b border-slate-100 py-3 last:border-b-0">
           <p class="text-sm font-medium text-slate-800">{{ post.content?.slice(0, 80) }}{{ (post.content?.length || 0) > 80 ? '...' : '' }}</p>
           <div class="mt-1 flex gap-4 text-xs text-slate-400">
-            <span class="flex items-center gap-1">
-              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
-              {{ post.likesCount }}
-            </span>
-            <span class="flex items-center gap-1">
-              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"/></svg>
-              {{ post.commentsCount }}
-            </span>
+            <span>{{ post.likesCount }} curtidas</span>
+            <span>{{ post.commentsCount }} comentários</span>
           </div>
         </div>
       </div>
-
-      <!-- Boost button US-040 -->
       <div class="mt-4 app-card p-5 flex items-center justify-between">
         <div>
           <h3 class="font-semibold text-slate-900">Impulsionar posts</h3>
-          <p class="text-sm text-slate-500">Aumente a visibilidade dos seus updates para mais investidores.</p>
+          <p class="text-sm text-slate-500">Aumente a visibilidade para investidores.</p>
         </div>
         <button (click)="showBoostModal = true" class="app-button-primary shrink-0">Impulsionar</button>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- Boost modal US-040 -->
+<!-- Boost modal -->
 <div *ngIf="showBoostModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" (click)="showBoostModal = false">
   <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
-    <div class="mb-4 flex items-center gap-3">
-      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-700 text-white">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
-      </span>
-      <h2 class="text-lg font-bold text-slate-900">Impulsionar post</h2>
-    </div>
-    <p class="mb-5 text-sm text-slate-600 leading-relaxed">
-      O impulsionamento de posts é uma funcionalidade premium que aumenta a visibilidade da sua startup para investidores e founders relevantes. Estará disponível em breve.
-    </p>
-    <div class="mb-5 space-y-2">
-      <div class="flex items-center gap-3 rounded-lg bg-slate-50 p-3 text-sm">
-        <span class="text-emerald-600">✓</span> <span>Destaque no feed por 7 dias</span>
-      </div>
-      <div class="flex items-center gap-3 rounded-lg bg-slate-50 p-3 text-sm">
-        <span class="text-emerald-600">✓</span> <span>Notificação para investidores compatíveis</span>
-      </div>
-      <div class="flex items-center gap-3 rounded-lg bg-slate-50 p-3 text-sm">
-        <span class="text-emerald-600">✓</span> <span>Analytics avançado do post</span>
-      </div>
-    </div>
+    <h2 class="mb-4 text-lg font-bold text-slate-900">Impulsionar post</h2>
+    <p class="mb-5 text-sm text-slate-600 leading-relaxed">Funcionalidade premium em breve — aumente a visibilidade para investidores compatíveis.</p>
     <div class="flex gap-3">
       <button class="app-button-primary flex-1" disabled>Disponível em breve</button>
       <button (click)="showBoostModal = false" class="app-button-secondary">Fechar</button>
